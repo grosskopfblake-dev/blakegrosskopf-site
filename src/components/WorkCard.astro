@@ -1,0 +1,83 @@
+---
+import ImageSlot from './ImageSlot.astro';
+interface Props {
+  slug: string;
+  data: any;
+  index?: number;
+  featured?: boolean;
+}
+const { slug, data, index, featured = false } = Astro.props;
+const motif = data.lane === 'Identity' || data.lane === 'Tooling' ? 'terminal' : data.lane === 'Cloud' ? 'chain' : 'grid';
+const stack = (data.stack ?? []).slice(0, 4);
+const extraStack = Math.max(0, (data.stack ?? []).length - 4);
+const statusLabel = data.status === 'in-progress' ? 'In progress' : data.status === 'ongoing' ? 'Ongoing' : 'Complete';
+---
+<a href={`/work/${slug}/`} class:list={['card', featured && 'card--featured']}>
+  <div class="card-media">
+    <ImageSlot src={data.cardImage} alt={data.cardAlt ?? data.title} ratio={featured ? '16/10' : '16/9'} motif={motif} label={data.lane} />
+  </div>
+  <div class="card-body">
+    <div class="card-top">
+      <span class="card-lane">{data.lane}</span>
+      <span class="card-status" data-status={data.status}>{statusLabel}</span>
+    </div>
+    <h3 class="card-title">{data.title}</h3>
+    <p class="card-sum">{data.summary}</p>
+    <div class="card-meta">
+      <div class="card-chips">
+        {stack.map((s: string) => <span class="chip">{s}</span>)}
+        {extraStack > 0 && <span class="chip">+{extraStack}</span>}
+      </div>
+      <span class="card-go">
+        Read case study
+        <svg class="arw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+      </span>
+    </div>
+  </div>
+</a>
+
+<style>
+  .card {
+    display: flex; flex-direction: column;
+    border: 1px solid var(--rule); border-radius: var(--r-lg);
+    background: var(--surface); overflow: hidden;
+    transition: border-color var(--dur-2) var(--ease), transform var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease);
+    height: 100%;
+  }
+  .card:hover { border-color: var(--rule-2); transform: translateY(-3px); box-shadow: var(--shadow); }
+  .card:hover .card-go .arw { transform: translateX(4px); }
+  .card:hover .card-title { color: var(--verm-hot); }
+  .card-media { padding: 0.9rem 0.9rem 0; }
+  .card-media :global(.slot) { border-radius: var(--r); }
+  .card-body { padding: 1.1rem 1.15rem 1.2rem; display: flex; flex-direction: column; gap: 0.7rem; flex: 1; }
+  .card-top { display: flex; align-items: center; justify-content: space-between; }
+  .card-lane {
+    font-family: var(--font-mono); font-size: var(--t-micro); letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--verm-hot);
+  }
+  .card-status {
+    font-family: var(--font-mono); font-size: var(--t-micro); letter-spacing: 0.08em;
+    color: var(--fg-3); display: inline-flex; align-items: center; gap: 0.4rem;
+  }
+  .card-status::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--sev-low); }
+  .card-status[data-status='in-progress']::before { background: var(--sev-medium); }
+  .card-title { font-size: var(--t-h3); transition: color var(--dur-1) var(--ease); }
+  .card-sum { font-family: var(--font-serif); color: var(--fg-2); font-size: 1.02rem; line-height: 1.5; }
+  .card-meta { margin-top: auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.8rem; padding-top: 0.4rem; }
+  .card-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+  .card-go {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    font-family: var(--font-mono); font-size: var(--t-small); color: var(--fg); white-space: nowrap;
+  }
+  .card-go .arw { width: 15px; height: 15px; color: var(--verm-hot); transition: transform var(--dur-1) var(--ease); }
+
+  .card--featured { }
+  @media (min-width: 800px) {
+    .card--featured { flex-direction: row; }
+    .card--featured .card-media { flex: 1 1 46%; padding: 0.9rem 0 0.9rem 0.9rem; display: flex; }
+    .card--featured .card-media :global(.slot) { width: 100%; height: 100%; }
+    .card--featured .card-body { flex: 1 1 54%; padding: 1.6rem 1.7rem; justify-content: center; gap: 0.9rem; }
+    .card--featured .card-title { font-size: var(--t-h2); }
+    .card--featured .card-sum { font-size: 1.12rem; }
+  }
+</style>

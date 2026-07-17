@@ -1,0 +1,127 @@
+/* ============================================================
+   Design tokens — "Vermillion Dispatch" (A + C remix)
+   Dark is the brand default; light is a considered alternate.
+   Style components through these tokens, never raw hex.
+   ============================================================ */
+:root {
+  /* — type families — */
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+
+  /* — fluid type scale — */
+  --t-micro: 0.6875rem;   /* 11px  labels, mono meta */
+  --t-small: 0.8125rem;   /* 13px  captions */
+  --t-body: 1.0625rem;    /* 17px  base */
+  --t-body-lg: 1.1875rem; /* 19px  serif reading */
+  --t-h4: 1.25rem;
+  --t-h3: clamp(1.35rem, 1.1rem + 1.1vw, 1.75rem);
+  --t-h2: clamp(1.7rem, 1.3rem + 1.9vw, 2.5rem);
+  --t-h1: clamp(2.4rem, 1.5rem + 4.4vw, 4.25rem);
+
+  /* — spacing scale (8pt-ish) — */
+  --sp-1: 0.25rem; --sp-2: 0.5rem; --sp-3: 0.75rem; --sp-4: 1rem;
+  --sp-5: 1.5rem; --sp-6: 2rem; --sp-7: 3rem; --sp-8: 4.5rem; --sp-9: 6.5rem;
+
+  --maxw: 1180px;
+  --maxw-read: 68ch;      /* case-study reading measure */
+  --r: 3px; --r-lg: 6px;
+  --rule-w: 1px;
+
+  /* — motion — */
+  --ease: cubic-bezier(.22,.61,.36,1);
+  --dur-1: 140ms; --dur-2: 320ms; --dur-3: 620ms;
+
+  /* — semantic severity (separate from the vermillion accent) — */
+  --sev-critical: #E1391F;
+  --sev-high: #E08A3C;
+  --sev-medium: #C9A227;
+  --sev-low: #5E9C8F;
+  --sev-info: #7E8B9C;
+
+  /* ---------- DARK (default brand) ---------- */
+  --bg: #100E10;
+  --bg-tint: #17111a;      /* used in hero radial */
+  --surface: #17141A;
+  --surface-2: #1E1A21;
+  --fg: #F3EFE8;
+  --fg-2: #A79EA3;
+  --fg-3: #8A8189;
+  --rule: #2A2430;
+  --rule-2: #362E3C;
+  --verm: #E1391F;
+  --verm-hot: #F0603C;     /* hover / live node / accent text on dark */
+  --verm-ink: #F3EFE8;
+  --btn-fill: #C9301A;        /* deeper red so white label clears AA 4.5:1 on dark */
+  --btn-fill-hover: #B22814;     /* text on a vermillion fill */
+  --glow: rgba(225,57,31,.16);
+  --shadow: 0 30px 70px -44px rgba(0,0,0,.9);
+  --selection: rgba(240,96,60,.28);
+  color-scheme: dark;
+}
+
+/* ---------- LIGHT (considered alternate) ---------- */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    --bg: #F4F0E9;
+    --bg-tint: #efe7db;
+    --surface: #FBF8F2;
+    --surface-2: #F1EBE0;
+    --fg: #171310;
+    --fg-2: #5B534D;
+    --fg-3: #6E655D;
+    --rule: #E0D8C9;
+    --rule-2: #D2C8B6;
+    --verm: #C22E17;
+    --verm-hot: #A8250F;
+    --verm-ink: #FBF8F2;
+  --btn-fill: #C22E17;
+  --btn-fill-hover: #A8250F;
+    --glow: rgba(194,46,23,.12);
+    --shadow: 0 24px 50px -40px rgba(52,30,20,.5);
+    --selection: rgba(194,46,23,.18);
+    color-scheme: light;
+  }
+}
+
+:root[data-theme="light"] {
+  --bg: #F4F0E9;
+  --bg-tint: #efe7db;
+  --surface: #FBF8F2;
+  --surface-2: #F1EBE0;
+  --fg: #171310;
+  --fg-2: #5B534D;
+  --fg-3: #6E655D;
+  --rule: #E0D8C9;
+  --rule-2: #D2C8B6;
+  --verm: #C22E17;
+  --verm-hot: #A8250F;
+  --verm-ink: #FBF8F2;
+  --btn-fill: #C22E17;
+  --btn-fill-hover: #A8250F;
+  --glow: rgba(194,46,23,.12);
+  --shadow: 0 24px 50px -40px rgba(52,30,20,.5);
+  --selection: rgba(194,46,23,.18);
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --bg: #100E10;
+  --bg-tint: #17111a;
+  --surface: #17141A;
+  --surface-2: #1E1A21;
+  --fg: #F3EFE8;
+  --fg-2: #A79EA3;
+  --fg-3: #8A8189;
+  --rule: #2A2430;
+  --rule-2: #362E3C;
+  --verm: #E1391F;
+  --verm-hot: #F0603C;
+  --verm-ink: #F3EFE8;
+  --btn-fill: #C9301A;        /* deeper red so white label clears AA 4.5:1 on dark */
+  --btn-fill-hover: #B22814;
+  --glow: rgba(225,57,31,.16);
+  --shadow: 0 30px 70px -44px rgba(0,0,0,.9);
+  --selection: rgba(240,96,60,.28);
+  color-scheme: dark;
+}

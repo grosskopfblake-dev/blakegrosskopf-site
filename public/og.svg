@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" font-family="'Space Grotesk',system-ui,sans-serif">
+  <rect width="1200" height="630" fill="#100E10"/>
+  <g stroke="#2A2430" stroke-width="1">
+    <path d="M0 40h1200M0 590h1200" />
+  </g>
+  <radialGradient id="g" cx="82%" cy="18%" r="60%">
+    <stop offset="0" stop-color="#17111a"/>
+    <stop offset="1" stop-color="#100E10"/>
+  </radialGradient>
+  <rect width="1200" height="630" fill="url(#g)"/>
+  <rect x="80" y="86" width="20" height="20" rx="3" fill="#E1391F" transform="rotate(45 90 96)"/>
+  <text x="118" y="103" fill="#F3EFE8" font-size="26" font-weight="500" letter-spacing="-0.5">Blake Grosskopf</text>
+  <text x="80" y="300" fill="#F0603C" font-size="22" font-family="'JetBrains Mono',monospace" letter-spacing="4">CLOUD &amp; IDENTITY · OFFENSIVE SECURITY RESEARCH</text>
+  <text x="76" y="392" fill="#F3EFE8" font-size="76" font-weight="500" letter-spacing="-2">I build and break cloud</text>
+  <text x="76" y="478" fill="#F3EFE8" font-size="76" font-weight="500" letter-spacing="-2">identity systems<tspan fill="#A79EA3"> — both sides.</tspan></text>
+  <g transform="translate(80,548)" font-family="'JetBrains Mono',monospace" font-size="20" fill="#A79EA3" letter-spacing="2">
+    <text x="0" y="0">AZ-900 · SC-900 · SC-500 · CARTP</text>
+    <text x="1044" y="0" fill="#7C737A">blakegrosskopf.com</text>
+  </g>
+</svg>

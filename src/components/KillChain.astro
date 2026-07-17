@@ -1,0 +1,102 @@
+---
+/*
+  KillChain — the site's signature component.
+  A stepped attack-path rail (public exposure → control). Reused on the home
+  "Selected Work" hero and inside case studies. Renders any length; on mobile it
+  becomes a vertical ladder so long chains never break the layout.
+
+  Props:
+    steps: { title, mitre?, detail?, live? }[]
+    caption?: string   — left cap label
+    note?: string      — right cap label
+    variant?: 'hero' | 'inline'
+*/
+interface Step { title: string; mitre?: string; detail?: string; live?: boolean; }
+interface Props { steps: Step[]; caption?: string; note?: string; variant?: 'hero' | 'inline'; }
+const { steps, caption, note, variant = 'inline' } = Astro.props;
+---
+<figure class:list={['kc', `kc--${variant}`]} role="group" aria-label={caption ?? 'Attack path'}>
+  {(caption || note) && (
+    <figcaption class="kc-cap">
+      {caption && <span>{caption}</span>}
+      {note && <span class="kc-note">{note}</span>}
+    </figcaption>
+  )}
+  <ol class="kc-rail">
+    {steps.map((s, i) => (
+      <li class:list={['kc-node', s.live && 'is-live']}>
+        <span class="kc-n">{String(i + 1).padStart(2, '0')}</span>
+        {s.live && <span class="kc-pulse" aria-hidden="true"></span>}
+        <span class="kc-t">{s.title}</span>
+        {s.mitre && <span class="kc-m">{s.mitre}</span>}
+        {i < steps.length - 1 && (
+          <svg class="kc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        )}
+      </li>
+    ))}
+  </ol>
+</figure>
+
+<style>
+  .kc { margin: 0; }
+  .kc-cap {
+    font-family: var(--font-mono); font-size: var(--t-micro); letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--fg-3);
+    display: flex; justify-content: space-between; gap: 1rem; margin-bottom: 0.85rem;
+  }
+  .kc-note { color: var(--verm-hot); }
+  .kc-rail { list-style: none; margin: 0; padding: 0; display: flex; align-items: stretch; }
+  .kc-node {
+    flex: 1 1 0; min-width: 0; position: relative;
+    border: 1px solid var(--rule); border-right: 0;
+    background: var(--surface); padding: 0.85rem 0.85rem 1rem;
+    transition: background var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease);
+  }
+  .kc-node:first-child { border-top-left-radius: var(--r); border-bottom-left-radius: var(--r); }
+  .kc-node:last-child { border-right: 1px solid var(--rule); border-top-right-radius: var(--r); border-bottom-right-radius: var(--r); }
+  .kc-node:hover { background: var(--surface-2); }
+  .kc-node.is-live {
+    background: linear-gradient(180deg, var(--glow), transparent 70%);
+    border-color: var(--verm);
+  }
+  .kc-node.is-live:last-child { border-right-color: var(--verm); }
+  .kc-n { font-family: var(--font-mono); font-size: var(--t-micro); color: var(--fg-3); }
+  .kc-node.is-live .kc-n { color: var(--verm-hot); }
+  .kc-t { display: block; margin-top: 0.5rem; font-size: 0.9rem; font-weight: 500; line-height: 1.2; letter-spacing: -0.01em; }
+  .kc-m { display: block; margin-top: 0.5rem; font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.04em; color: var(--fg-3); }
+  .kc-arrow {
+    position: absolute; right: -7px; top: 50%; transform: translateY(-50%);
+    width: 13px; height: 13px; color: var(--fg-3); z-index: 2; background: var(--bg);
+  }
+  .kc-node.is-live .kc-arrow { color: var(--verm); }
+  .kc-pulse {
+    position: absolute; top: 0.85rem; right: 0.85rem;
+    width: 7px; height: 7px; border-radius: 50%; background: var(--verm-hot);
+    box-shadow: 0 0 0 0 var(--glow); animation: kc-pulse 2.4s var(--ease) infinite;
+  }
+  @keyframes kc-pulse {
+    70% { box-shadow: 0 0 0 9px transparent; }
+    100% { box-shadow: 0 0 0 0 transparent; }
+  }
+  @media (prefers-reduced-motion: reduce) { .kc-pulse { animation: none; } }
+
+  /* Hero variant lets the rail scroll horizontally rather than crush on tablet. */
+  .kc--hero .kc-rail { overflow-x: auto; scrollbar-width: thin; padding-bottom: 4px; }
+  .kc--hero .kc-node { flex: 1 0 8.5rem; }
+
+  /* Mobile: vertical ladder — long chains stay readable, never overflow. */
+  @media (max-width: 640px) {
+    .kc-rail { flex-direction: column; overflow: visible; }
+    .kc--hero .kc-node { flex: 1 1 auto; }
+    .kc-node { border-right: 1px solid var(--rule); border-bottom: 0; }
+    .kc-node:first-child { border-radius: var(--r) var(--r) 0 0; }
+    .kc-node:last-child { border-bottom: 1px solid var(--rule); border-radius: 0 0 var(--r) var(--r); }
+    .kc-node.is-live:last-child { border-bottom-color: var(--verm); }
+    .kc-arrow { right: 50%; top: auto; bottom: -7px; transform: translateX(50%) rotate(90deg); }
+    .kc-t { display: inline; margin-left: 0.5rem; }
+    .kc-n { display: inline; }
+    .kc-m { margin-top: 0.35rem; }
+  }
+</style>

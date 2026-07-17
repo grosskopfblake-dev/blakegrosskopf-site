@@ -1,0 +1,124 @@
+---
+/*
+  ImageSlot — a fixed-aspect image slot. If `src` is set it renders the image;
+  otherwise it draws a generative SVG placeholder in the same box, so dropping a
+  real screenshot in later causes ZERO layout shift. Image paths are frontmatter
+  fields; store real files under /public/img/work/<slug>/.
+
+  Props:
+    src?: string        — image path (e.g. /img/work/slug/hero.png)
+    alt?: string
+    ratio?: string      — "16/10" (card) | "21/9" (hero) | "3/2" (figure)
+    motif?: 'chain' | 'grid' | 'terminal'   — placeholder artwork when no src
+    label?: string      — small caption on the placeholder
+    loading?: 'lazy' | 'eager'
+*/
+interface Props {
+  src?: string; alt?: string; ratio?: string;
+  motif?: 'chain' | 'grid' | 'terminal'; label?: string;
+  loading?: 'lazy' | 'eager';
+}
+const { src, alt = '', ratio = '16/10', motif = 'grid', label, loading = 'lazy' } = Astro.props;
+---
+<div class="slot" style={`--ratio:${ratio}`}>
+  {src ? (
+    <img src={src} alt={alt} loading={loading} decoding="async" />
+  ) : (
+    <div class:list={['ph', `ph--${motif}`]} role="img" aria-label={alt || 'Placeholder graphic'}>
+      <svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <rect class="ph-fill-2" width="320" height="200" />
+        <g class="ph-lines">
+          {Array.from({ length: 17 }).map((_, i) => (
+            <line x1={i * 20} y1="0" x2={i * 20} y2="200" />
+          ))}
+          {Array.from({ length: 11 }).map((_, i) => (
+            <line x1="0" y1={i * 20} x2="320" y2={i * 20} />
+          ))}
+        </g>
+
+        {motif === 'chain' && (
+          <g class="ph-chain">
+            <line class="ph-rail" x1="36" y1="100" x2="284" y2="100" />
+            {[36, 98, 160, 222, 284].map((x, i) => (
+              <circle class:list={['ph-dot', i === 3 && 'is-live']} cx={x} cy="100" r={i === 3 ? 9 : 6} />
+            ))}
+            <circle class="ph-halo" cx="222" cy="100" r="16" />
+            <path class="ph-arrow" d="M270 94l10 6-10 6" />
+          </g>
+        )}
+        {motif === 'terminal' && (
+          <g class="ph-term">
+            <rect class="ph-win" x="28" y="34" width="264" height="132" rx="4" />
+            <circle class="ph-btn-v" cx="40" cy="46" r="2.5" />
+            <circle class="ph-btn" cx="49" cy="46" r="2.5" />
+            <circle class="ph-btn" cx="58" cy="46" r="2.5" />
+            <rect class="ph-l" x="40" y="82" width="150" height="7" />
+            <rect class="ph-l" x="40" y="96" width="96" height="7" />
+            <rect class="ph-l2" x="40" y="110" width="120" height="7" />
+            <rect class="ph-lv" x="40" y="124" width="60" height="7" />
+            <rect class="ph-cursor" x="52" y="66" width="6" height="9" />
+            <rect class="ph-prompt" x="40" y="66" width="8" height="9" />
+          </g>
+        )}
+        {motif === 'grid' && (
+          <g class="ph-target">
+            <circle class="ph-ring" cx="160" cy="100" r="42" />
+            <circle class="ph-ring2" cx="160" cy="100" r="26" />
+            <circle class="ph-center" cx="160" cy="100" r="4" />
+            <line class="ph-cross" x1="0" y1="100" x2="320" y2="100" />
+            <line class="ph-cross" x1="160" y1="0" x2="160" y2="200" />
+          </g>
+        )}
+      </svg>
+      {label && <span class="ph-label">{label}</span>}
+    </div>
+  )}
+</div>
+
+<style>
+  .slot {
+    aspect-ratio: var(--ratio);
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    position: relative;
+  }
+  .slot img { width: 100%; height: 100%; object-fit: cover; }
+  .ph { position: absolute; inset: 0; background: var(--surface); }
+  .ph svg { width: 100%; height: 100%; }
+
+  .ph-fill-2 { fill: var(--surface-2); }
+  .ph-lines line { stroke: var(--rule); stroke-width: 1; opacity: 0.55; }
+
+  /* chain motif */
+  .ph-rail { stroke: var(--rule-2); stroke-width: 2; }
+  .ph-dot { fill: var(--surface); stroke: var(--rule-2); stroke-width: 2; }
+  .ph-dot.is-live { stroke: var(--verm); }
+  .ph-halo { fill: none; stroke: var(--verm); stroke-width: 1.5; opacity: 0.4; }
+  .ph-arrow { fill: none; stroke: var(--verm); stroke-width: 2; }
+
+  /* terminal motif */
+  .ph-win { fill: var(--bg); stroke: var(--rule); stroke-width: 1; }
+  .ph-btn { fill: var(--rule-2); }
+  .ph-btn-v { fill: var(--verm); }
+  .ph-l { fill: var(--rule); }
+  .ph-l2 { fill: var(--rule-2); }
+  .ph-lv { fill: var(--verm); opacity: 0.7; }
+  .ph-prompt { fill: var(--verm-hot); }
+  .ph-cursor { fill: var(--fg-3); }
+
+  /* grid/target motif */
+  .ph-ring { fill: none; stroke: var(--rule-2); stroke-width: 1.5; }
+  .ph-ring2 { fill: none; stroke: var(--verm); stroke-width: 1.5; opacity: 0.5; }
+  .ph-center { fill: var(--verm); }
+  .ph-cross { stroke: var(--rule); stroke-width: 1; stroke-dasharray: 2 6; }
+
+  .ph-label {
+    position: absolute; left: 0.85rem; bottom: 0.7rem;
+    font-family: var(--font-mono); font-size: var(--t-micro); letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--fg-3);
+    background: color-mix(in srgb, var(--bg) 70%, transparent);
+    padding: 0.2rem 0.5rem; border-radius: var(--r); backdrop-filter: blur(2px);
+  }
+</style>

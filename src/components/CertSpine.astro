@@ -1,0 +1,40 @@
+---
+import { site } from '../lib/site';
+const stateLabel: Record<string, string> = { held: 'Held', active: 'Active', target: 'Target' };
+---
+<ul class="certs" aria-label="Certification progress">
+  {site.certs.map((c, i) => (
+    <li class:list={['cert', `is-${c.state}`]}>
+      <span class="cert-id">{c.id}</span>
+      <span class="cert-name">{c.name}</span>
+      <span class="cert-state">{stateLabel[c.state]}</span>
+      {i < site.certs.length - 1 && <span class="cert-sep" aria-hidden="true">→</span>}
+    </li>
+  ))}
+</ul>
+
+<style>
+  .certs { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.75rem 0.5rem; }
+  .cert {
+    position: relative; display: flex; flex-direction: column; gap: 0.25rem;
+    border: 1px solid var(--rule); border-radius: var(--r); padding: 0.7rem 0.9rem;
+    min-width: 8.5rem; flex: 1 1 auto;
+  }
+  .cert-id { font-family: var(--font-mono); font-weight: 500; font-size: 0.95rem; letter-spacing: 0.02em; }
+  .cert-name { font-size: var(--t-small); color: var(--fg-2); line-height: 1.3; }
+  .cert-state {
+    font-family: var(--font-mono); font-size: var(--t-micro); letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--fg-3);
+    display: inline-flex; align-items: center; gap: 0.4rem;
+  }
+  .cert-state::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--fg-3); }
+  .cert.is-held { border-color: var(--rule-2); }
+  .cert.is-held .cert-state { color: var(--sev-low); }
+  .cert.is-held .cert-state::before { background: var(--sev-low); }
+  .cert.is-active { border-color: var(--verm); }
+  .cert.is-active .cert-state { color: var(--verm-hot); }
+  .cert.is-active .cert-state::before { background: var(--verm); box-shadow: 0 0 0 3px var(--glow); }
+  .cert.is-target .cert-state::before { background: transparent; border: 1px solid var(--fg-3); }
+  .cert-sep { position: absolute; right: -0.5rem; top: 50%; transform: translateY(-50%); color: var(--fg-3); font-size: 0.8rem; z-index: 1; }
+  @media (max-width: 560px) { .cert-sep { display: none; } }
+</style>

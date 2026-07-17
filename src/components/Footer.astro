@@ -1,0 +1,43 @@
+---
+import { site } from '../lib/site';
+const year = new Date().getFullYear();
+---
+<footer class="site-foot">
+  <div class="container foot-in">
+    <div class="foot-lead">
+      <p class="eyebrow eyebrow--rule">Get in touch</p>
+      <a class="foot-mail" href={`mailto:${site.email}`}>{site.email}</a>
+    </div>
+    <nav class="foot-links" aria-label="Elsewhere">
+      <a href={site.socials.github} rel="me noopener" target="_blank">GitHub <span class="fl-h">↗</span></a>
+      <a href={site.socials.linkedin} rel="me noopener" target="_blank">LinkedIn <span class="fl-h">↗</span></a>
+      <a href={`mailto:${site.email}`}>Email</a>
+      <a href={site.resume}>Résumé <span class="fl-h">↓</span></a>
+    </nav>
+  </div>
+  <div class="container foot-base">
+    <span class="mono">{site.domain}</span>
+    <span class="mono">© {year} {site.name} · built with Astro</span>
+  </div>
+</footer>
+
+<style>
+  .site-foot { border-top: 1px solid var(--rule); margin-top: var(--sp-8); padding-block: var(--sp-7) var(--sp-5); }
+  .foot-in { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2rem 3rem; align-items: end; }
+  .foot-mail {
+    display: inline-block; margin-top: 0.9rem;
+    font-family: var(--font-display); font-size: clamp(1.4rem, 1rem + 2vw, 2.4rem);
+    font-weight: 500; letter-spacing: -0.02em;
+    border-bottom: 2px solid var(--rule); transition: border-color var(--dur-1) var(--ease);
+  }
+  .foot-mail:hover { border-color: var(--verm); }
+  .foot-links { display: flex; flex-wrap: wrap; gap: 0.4rem 1.6rem; font-family: var(--font-mono); font-size: var(--t-small); }
+  .foot-links a { color: var(--fg-2); transition: color var(--dur-1) var(--ease); }
+  .foot-links a:hover { color: var(--fg); }
+  .fl-h { color: var(--verm-hot); }
+  .foot-base {
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem;
+    margin-top: var(--sp-6); padding-top: var(--sp-4); border-top: 1px solid var(--rule);
+    font-size: var(--t-micro); letter-spacing: 0.06em; color: var(--fg-3);
+  }
+</style>

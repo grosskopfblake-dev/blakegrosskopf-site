@@ -1,0 +1,197 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { site } from '../lib/site';
+import KillChain from '../components/KillChain.astro';
+import WorkCard from '../components/WorkCard.astro';
+import CertSpine from '../components/CertSpine.astro';
+
+const work = (await getCollection('work', ({ data }) => !data.draft)).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+const featured = work.filter((w) => w.data.featured).slice(0, 2);
+const flagship = work.find((w) => w.id === 'operation-vermillion-drift') ?? featured[0];
+
+const posts = (await getCollection('writing', ({ data }) => !data.draft))
+  .sort((a, b) => +b.data.date - +a.data.date)
+  .slice(0, 2);
+
+const approach = [
+  { k: 'Build', v: 'I stand up the range myself — Terraform, real cloud, real constraints — so the attack path is genuine, not a screenshot.' },
+  { k: 'Break', v: 'External-attacker lens, end to end: public exposure → tokens → secrets → subscription-level control. Evidence, not adjectives.' },
+  { k: 'Document', v: 'Every finding maps to MITRE ATT&CK and ships with the defense — the control, the detection, the one change that breaks the chain.' },
+];
+const fmtDate = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+---
+<Base>
+  <!-- ===== HERO ===== -->
+  <section class="hero">
+    <div class="container hero-in">
+      <p class="eyebrow eyebrow--rule" data-reveal>{site.name} · {site.role}</p>
+      <h1 class="hero-h" data-reveal style="--reveal-delay:60ms">
+        I build and break cloud identity systems —<span class="hero-em"> then document both sides.</span>
+      </h1>
+      <p class="hero-lead serif" data-reveal style="--reveal-delay:120ms">{site.pitch}</p>
+      <div class="hero-cta" data-reveal style="--reveal-delay:180ms">
+        <a href="/work/" class="btn btn--primary">View the work <svg class="arw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a href="/writing/" class="btn">Read the writing</a>
+      </div>
+    </div>
+
+    {flagship?.data.killchain?.length > 0 && (
+      <div class="container hero-chain" data-reveal style="--reveal-delay:240ms">
+        <KillChain
+          steps={flagship.data.killchain}
+          caption={`${flagship.data.title} · AzureGoat`}
+          note="public URL → resource-group Contributor"
+          variant="hero"
+        />
+        <a href={`/work/${flagship.id}/`} class="hero-chain-link">
+          Walk the full chain
+          <svg class="arw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+    )}
+  </section>
+
+  <!-- ===== SELECTED WORK ===== -->
+  <section class="section" aria-labelledby="work-h">
+    <div class="container">
+      <div class="sec-head" data-reveal>
+        <h2 id="work-h"><span class="marker">01</span>Selected work</h2>
+        <a href="/work/" class="sec-more">All work <svg class="arw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+      <div class="work-grid">
+        {featured.map((w, i) => (
+          <div data-reveal style={`--reveal-delay:${i * 90}ms`}>
+            <WorkCard slug={w.id} data={w.data} featured />
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== APPROACH ===== -->
+  <section class="section section--tight approach" aria-labelledby="approach-h">
+    <div class="container">
+      <h2 id="approach-h" class="sr-only">Approach</h2>
+      <p class="eyebrow" data-reveal>How I work</p>
+      <ol class="approach-grid">
+        {approach.map((a, i) => (
+          <li class="approach-item" data-reveal style={`--reveal-delay:${i * 80}ms`}>
+            <span class="approach-k">{a.k}</span>
+            <p class="approach-v">{a.v}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- ===== WRITING ===== -->
+  <section class="section" aria-labelledby="writing-h">
+    <div class="container">
+      <div class="sec-head" data-reveal>
+        <h2 id="writing-h"><span class="marker">02</span>Latest writing</h2>
+        <a href="/writing/" class="sec-more">All writing <svg class="arw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+      <ul class="post-list">
+        {posts.map((p, i) => (
+          <li data-reveal style={`--reveal-delay:${i * 80}ms`}>
+            <a href={`/writing/${p.id}/`} class="post-row">
+              <time class="post-date mono" datetime={p.data.date.toISOString().slice(0, 10)}>{fmtDate(p.data.date)}</time>
+              <span class="post-body">
+                <span class="post-title">{p.data.title}</span>
+                <span class="post-desc serif">{p.data.description}</span>
+              </span>
+              <svg class="arw post-arw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== CREDIBILITY / CERTS ===== -->
+  <section class="section section--tight" aria-labelledby="certs-h">
+    <div class="container">
+      <div class="sec-head" data-reveal><h2 id="certs-h"><span class="marker">03</span>Cert spine</h2></div>
+      <div data-reveal><CertSpine /></div>
+    </div>
+  </section>
+
+  <!-- ===== CONTACT CTA ===== -->
+  <section class="section contact-cta" aria-labelledby="cta-h">
+    <div class="container cta-in" data-reveal>
+      <h2 id="cta-h">Hiring for cloud pentest, red team, or identity security?</h2>
+      <p class="serif cta-lead">I'm open to roles and collaboration. The fastest way to gauge fit is to read a case study — then say hello.</p>
+      <div class="hero-cta">
+        <a href="/contact/" class="btn btn--primary">Get in touch <svg class="arw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a href={site.socials.github} class="btn" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero { padding-top: clamp(3rem, 8vw, 6rem); padding-bottom: clamp(2rem, 5vw, 3.5rem); position: relative; overflow: hidden; }
+  .hero::before {
+    content: ""; position: absolute; inset: -20% -10% auto auto; width: 60vw; height: 60vw; max-width: 720px; max-height: 720px;
+    background: radial-gradient(circle at 70% 30%, var(--bg-tint), transparent 62%); pointer-events: none; z-index: 0;
+  }
+  .hero-in { position: relative; z-index: 1; }
+  .hero-h { font-size: var(--t-h1); max-width: 16ch; margin-top: 1.4rem; }
+  .hero-em { color: var(--fg-2); }
+  .hero-lead { max-width: 54ch; margin-top: 1.5rem; font-size: clamp(1.1rem, 0.95rem + 0.7vw, 1.35rem); line-height: 1.55; color: var(--fg-2); }
+  .hero-cta { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2rem; }
+  .btn .arw { width: 15px; height: 15px; }
+
+  .hero-chain { position: relative; z-index: 1; margin-top: clamp(2.5rem, 6vw, 4rem); }
+  .hero-chain-link {
+    display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 1rem;
+    font-family: var(--font-mono); font-size: var(--t-small); color: var(--fg-2);
+  }
+  .hero-chain-link:hover { color: var(--fg); }
+  .hero-chain-link .arw { width: 14px; height: 14px; color: var(--verm-hot); transition: transform var(--dur-1) var(--ease); }
+  .hero-chain-link:hover .arw { transform: translateX(3px); }
+
+  .sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; }
+  .sec-head h2 { font-size: var(--t-h2); }
+  .marker { font-size: 0.5em; vertical-align: 0.55em; margin-right: 0.15em; letter-spacing: 0.1em; }
+  .sec-more { display: inline-flex; align-items: center; gap: 0.4rem; font-family: var(--font-mono); font-size: var(--t-small); color: var(--fg-2); white-space: nowrap; }
+  .sec-more:hover { color: var(--fg); }
+  .sec-more .arw { width: 14px; height: 14px; color: var(--verm-hot); transition: transform var(--dur-1) var(--ease); }
+  .sec-more:hover .arw { transform: translateX(3px); }
+
+  .work-grid { display: grid; gap: 1.25rem; }
+
+  .approach { border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); background: var(--surface); }
+  .approach-grid { list-style: none; margin: 1.5rem 0 0; padding: 0; display: grid; gap: 1.5rem; grid-template-columns: 1fr; counter-reset: none; }
+  .approach-item { display: flex; flex-direction: column; gap: 0.5rem; padding-top: 1rem; border-top: 2px solid var(--verm); }
+  .approach-k { font-family: var(--font-display); font-weight: 500; font-size: 1.15rem; letter-spacing: -0.01em; }
+  .approach-v { font-family: var(--font-serif); color: var(--fg-2); font-size: 1.02rem; line-height: 1.5; }
+  @media (min-width: 760px) { .approach-grid { grid-template-columns: repeat(3, 1fr); gap: 2rem; } }
+
+  .post-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); }
+  .post-row {
+    display: grid; grid-template-columns: 8.5rem 1fr auto; align-items: center; gap: 1.25rem;
+    padding: 1.4rem 0.25rem; border-bottom: 1px solid var(--rule);
+    transition: padding var(--dur-2) var(--ease);
+  }
+  .post-row:hover { padding-left: 0.9rem; padding-right: 0.9rem; background: var(--surface); }
+  .post-row:hover .post-title { color: var(--verm-hot); }
+  .post-row:hover .post-arw { transform: translateX(4px); }
+  .post-date { font-size: var(--t-small); color: var(--fg-3); }
+  .post-body { display: flex; flex-direction: column; gap: 0.3rem; min-width: 0; }
+  .post-title { font-family: var(--font-display); font-weight: 500; font-size: 1.2rem; letter-spacing: -0.01em; transition: color var(--dur-1) var(--ease); }
+  .post-desc { color: var(--fg-2); font-size: 1rem; line-height: 1.45; }
+  .post-arw { width: 16px; height: 16px; color: var(--verm-hot); transition: transform var(--dur-1) var(--ease); }
+  @media (max-width: 600px) {
+    .post-row { grid-template-columns: 1fr auto; }
+    .post-date { grid-column: 1 / -1; }
+  }
+
+  .contact-cta { border-top: 1px solid var(--rule); }
+  .cta-in { max-width: 40ch; }
+  .cta-in h2 { font-size: var(--t-h2); }
+  .cta-lead { margin-top: 1rem; color: var(--fg-2); font-size: 1.15rem; line-height: 1.5; max-width: 46ch; }
+</style>

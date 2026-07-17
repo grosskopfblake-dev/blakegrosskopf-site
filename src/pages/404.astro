@@ -1,0 +1,23 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="404 — Not found" description="That page could not be found.">
+  <section class="section nf">
+    <div class="container">
+      <p class="eyebrow eyebrow--rule">HTTP 404</p>
+      <h1 class="nf-h">No route to host.</h1>
+      <p class="nf-lead serif">That page doesn't exist — or it was never public. Try the work index or head home.</p>
+      <div class="hero-cta">
+        <a href="/" class="btn btn--primary">Home</a>
+        <a href="/work/" class="btn">View the work</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .nf { min-height: 52vh; display: grid; align-items: center; }
+  .nf-h { margin-top: 1rem; }
+  .nf-lead { margin-top: 1rem; color: var(--fg-2); font-size: 1.2rem; max-width: 46ch; }
+  .hero-cta { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.8rem; }
+</style>
