@@ -86,17 +86,27 @@ const { steps, caption, note, variant = 'inline' } = Astro.props;
   .kc--hero .kc-rail { overflow-x: auto; scrollbar-width: thin; padding-bottom: 4px; }
   .kc--hero .kc-node { flex: 1 0 8.5rem; }
 
-  /* Mobile: vertical ladder — long chains stay readable, never overflow. */
+  /* Mobile: separated cards connected by clear down-arrows — reads as a real
+     stepped chain, never a cramped flush stack. */
   @media (max-width: 640px) {
-    .kc-rail { flex-direction: column; overflow: visible; }
-    .kc--hero .kc-node { flex: 1 1 auto; }
-    .kc-node { border-right: 1px solid var(--rule); border-bottom: 0; }
-    .kc-node:first-child { border-radius: var(--r) var(--r) 0 0; }
-    .kc-node:last-child { border-bottom: 1px solid var(--rule); border-radius: 0 0 var(--r) var(--r); }
-    .kc-node.is-live:last-child { border-bottom-color: var(--verm); }
-    .kc-arrow { right: 50%; top: auto; bottom: -7px; transform: translateX(50%) rotate(90deg); }
-    .kc-t { display: inline; margin-left: 0.5rem; }
+    .kc-cap { flex-direction: column; align-items: flex-start; gap: 0.3rem; }
+    .kc--hero .kc-rail,
+    .kc-rail { flex-direction: column; overflow: visible; gap: 1.5rem; }
+    .kc--hero .kc-node,
+    .kc-node {
+      flex: 1 1 auto;
+      border: 1px solid var(--rule); border-radius: var(--r);
+      padding: 0.95rem 1rem;
+    }
+    .kc-node.is-live { border-color: var(--verm); }
+    /* down-arrow sits centered in the gap below each box (last box has none) */
+    .kc-arrow {
+      right: 50%; top: auto; bottom: -1.15rem; transform: translateX(50%) rotate(90deg);
+      width: 18px; height: 18px; color: var(--fg-2); background: transparent;
+    }
+    .kc-node.is-live .kc-arrow { color: var(--verm); }
+    .kc-t { display: inline; margin-left: 0.5rem; font-size: 0.95rem; }
     .kc-n { display: inline; }
-    .kc-m { margin-top: 0.35rem; }
+    .kc-m { margin-top: 0.4rem; }
   }
 </style>

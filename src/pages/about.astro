@@ -24,11 +24,11 @@ const skills = [
 
       <div class="about-grid">
         <div class="about-bio prose" data-reveal>
-          <p>I'm an aspiring red teamer focused on <strong>cloud and enterprise attack paths</strong>. My work has one throughline: I don't just run tools against someone else's target — I <strong>build the environment myself</strong>, break it from an external attacker's position, then write the defense that would have stopped me.</p>
-          <p>I come at this from a <strong>software-engineering background</strong>, so the instinct underneath all of it is building. What I really enjoy is reverse-engineering how something works and turning that understanding into a solution — a script, a small tool, a primitive — in Python or whatever the problem calls for.</p>
-          <p>That instinct was shaped on the job. As a returning cybersecurity intern on a large enterprise's security team, I worked a MITRE/NIST-aligned, threat-based risk-assessment methodology, analyzed Active Directory privilege-escalation paths with PowerShell, and triaged reported phishing at scale — the enterprise-defense foundation under the self-directed offensive work below.</p>
-          <p>On the cloud side, I chain real Azure attack paths from anonymous public exposure to subscription-level control — standing up the range in Terraform and fighting the platform constraints of doing that on a locked-down subscription. Right now my research is centered on <strong>cloud and AI security</strong> and penetration testing.</p>
-          <p>Everything on this site is self-directed research on infrastructure I own or am authorized to test, framed dual-use: methodology, MITRE ATT&amp;CK mapping, and hardening. The runnable offensive tooling stays private; the understanding and the defenses are what I share.</p>
+          <p>I'm an aspiring red teamer working <strong>cloud and enterprise attack paths</strong>. The throughline in everything I do: I don't just point tools at someone else's target — I <strong>build the environment myself</strong>, break in from the outside, then write the defense that would've stopped me.</p>
+          <p>That comes from a <strong>software-engineering background</strong> — the instinct underneath all of it is building. I like taking something apart to see how it works, then turning that into a solution: a script, a small tool, a primitive, in Python or whatever fits.</p>
+          <p>It got sharper on the job. As a returning cybersecurity intern on a large enterprise's security team, I ran a MITRE/NIST-aligned, threat-based risk assessment, mapped Active Directory privilege-escalation paths with PowerShell, and triaged reported phishing at scale — the defensive foundation under the offensive work here.</p>
+          <p>On the cloud side I chain real Azure attack paths from public exposure to subscription-level control, standing the range up in Terraform and fighting the constraints of doing it on a locked-down subscription. Right now I'm focused on <strong>cloud and AI security</strong> and pen testing.</p>
+          <p>Everything here is self-directed research on infrastructure I own or am cleared to test, kept dual-use: methodology, ATT&amp;CK mapping, and hardening. The runnable tooling stays private — the understanding and the defenses are what I publish.</p>
         </div>
 
         <aside class="about-side" data-reveal style="--reveal-delay:80ms">
@@ -104,4 +104,20 @@ const skills = [
   .sk-none { font-family: var(--font-mono); font-size: var(--t-small); color: var(--fg-3); }
   .hero-cta { display: flex; flex-wrap: wrap; gap: 0.75rem; }
   .hero-cta .arw { width: 15px; height: 15px; }
+
+  /* Mobile: the skills table becomes stacked cards so the evidence column is
+     never hidden behind a horizontal scroll. */
+  @media (max-width: 620px) {
+    .scroll-x { overflow-x: visible; }
+    .skills, .skills tbody, .skills tr, .skills td { display: block; width: 100%; }
+    .skills thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+    .skills tr {
+      border: 1px solid var(--rule); border-radius: var(--r-lg);
+      padding: 0.9rem 1rem; margin-bottom: 0.75rem;
+    }
+    .skills td { border: 0; padding: 0; min-width: 0; }
+    .sk-name { font-size: 1.02rem; margin-bottom: 0.35rem; }
+    .sk-detail { font-size: 0.98rem; margin-bottom: 0.55rem; }
+    .sk-ev { font-size: var(--t-small); }
+  }
 </style>

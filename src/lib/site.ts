@@ -8,7 +8,7 @@ export const site = {
   description:
     'Aspiring red teamer, currently shadowing a red team. I build cloud and enterprise labs from scratch, break them end-to-end, and write the detections and defenses that stop the attack.',
   pitch:
-    'An aspiring red teamer, shadowing a red team while running my own labs. I stand up cloud and enterprise environments from scratch, attack them from an external position all the way to full control, then write the defense that would have stopped me.',
+    'An aspiring red teamer, currently shadowing a red team while I build and break my own labs. I stand up cloud and enterprise environments from scratch, get in from the outside, and push to full control — then write the defense that stops me.',
   email: 'grosskopfblake@gmail.com',
   socials: {
     github: 'https://github.com/grosskopfblake-dev',

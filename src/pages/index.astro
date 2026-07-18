@@ -29,7 +29,7 @@ const fmtDate = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', mo
     <div class="container hero-in">
       <p class="eyebrow eyebrow--rule" data-reveal>{site.name} · {site.role}</p>
       <h1 class="hero-h" data-reveal style="--reveal-delay:60ms">
-        I build cloud and enterprise labs, then break them —<span class="hero-em"> and write the defense that stops me.</span>
+        I build cloud and enterprise labs, then break them<span class="hero-em"> — and write the defense that stops me.</span>
       </h1>
       <p class="hero-lead serif" data-reveal style="--reveal-delay:120ms">{site.pitch}</p>
       <div class="hero-cta" data-reveal style="--reveal-delay:180ms">
@@ -144,6 +144,12 @@ const fmtDate = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', mo
   .hero-lead { max-width: 54ch; margin-top: 1.5rem; font-size: clamp(1.1rem, 0.95rem + 0.7vw, 1.35rem); line-height: 1.55; color: var(--fg-2); }
   .hero-cta { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2rem; }
   .btn .arw { width: 15px; height: 15px; }
+  @media (max-width: 520px) {
+    .hero-h { font-size: 2.15rem; line-height: 1.14; max-width: 20ch; }
+    .hero-lead { font-size: 1.08rem; margin-top: 1.2rem; }
+    .hero-cta { margin-top: 1.6rem; }
+    .hero-cta .btn { flex: 1 1 auto; justify-content: center; }
+  }
 
   .hero-chain { position: relative; z-index: 1; margin-top: clamp(2.5rem, 6vw, 4rem); }
   .hero-chain-link {
