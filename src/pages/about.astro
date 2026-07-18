@@ -3,16 +3,17 @@ import Base from '../layouts/Base.astro';
 import CertSpine from '../components/CertSpine.astro';
 import { site } from '../lib/site';
 
+const WORK = '/work/operation-vermillion-drift/';
 const skills = [
-  { skill: 'Azure cloud penetration testing', detail: 'SSRF, IMDS, managed-identity abuse, storage & secret looting', ev: 'operation-vermillion-drift', evLabel: 'Vermillion Drift' },
-  { skill: 'Infrastructure-as-Code (Terraform)', detail: 'Provisioning ranges + real-world deployment troubleshooting', ev: 'operation-vermillion-drift', evLabel: 'Vermillion Drift' },
-  { skill: 'Auth-protocol reverse engineering', detail: 'OAuth 2.0 / OIDC / PKCE, Okta OIE / IDX sign-in flows', ev: 'okta-oie-credential-oracle', evLabel: 'Okta OIE Oracle' },
-  { skill: 'Offensive tool development', detail: 'Python, stdlib-first, from captured traffic to working primitive', ev: 'okta-oie-credential-oracle', evLabel: 'Okta OIE Oracle' },
-  { skill: 'ARM REST API fluency', detail: 'Operating clouds through az rest when the CLI breaks', ev: 'operation-vermillion-drift', evLabel: 'Vermillion Drift' },
-  { skill: 'Dual-use / defensive translation', detail: 'MITRE ATT&CK mapping, detections, and tenant hardening', ev: 'okta-oie-credential-oracle', evLabel: 'both projects' },
+  { skill: 'Azure attack paths', detail: 'Public exposure → IMDS / managed-identity abuse → storage, secrets, and subscription-level control', href: WORK, evLabel: 'Vermillion Drift' },
+  { skill: 'Cloud range building (Terraform)', detail: 'Standing up real, misconfigured cloud environments as IaC — and troubleshooting live deployments', href: WORK, evLabel: 'Vermillion Drift' },
+  { skill: 'Active Directory enumeration & priv-esc', detail: 'PowerShell and BloodHound Enterprise — mapping privilege-escalation paths across a Windows domain', href: site.resume, evLabel: 'Resume' },
+  { skill: 'Threat-based risk assessment', detail: 'MITRE ATT&CK / NIST-aligned methodology; phishing triage at enterprise scale', href: site.resume, evLabel: 'Resume' },
+  { skill: 'ATT&CK mapping & detection', detail: 'Every finding mapped to a technique and paired with the control or detection that breaks it', href: WORK, evLabel: 'Vermillion Drift' },
+  { skill: 'Offensive tooling (Python)', detail: 'stdlib-first — from captured traffic to a working primitive', href: WORK, evLabel: 'Vermillion Drift' },
 ];
 ---
-<Base title="About" description="Blake Grosskopf — independent offensive-security researcher focused on cloud and identity.">
+<Base title="About" description="Blake Grosskopf — aspiring red teamer focused on cloud and enterprise attack paths.">
   <section class="section">
     <div class="container">
       <header class="page-head" data-reveal>
@@ -23,8 +24,10 @@ const skills = [
 
       <div class="about-grid">
         <div class="about-bio prose" data-reveal>
-          <p>I'm an independent offensive-security researcher working the seam where <strong>cloud and identity</strong> meet. My work has one throughline: I don't just run tools against someone else's target — I <strong>build the range myself</strong>, break it from an external attacker's position, and then write the defense that would have stopped me.</p>
-          <p>That plays out two ways. On the cloud side, I chain real Azure attack paths from anonymous public exposure to subscription-level control, and I've fought the platform constraints of doing that on a locked-down subscription. On the identity side, I reverse-engineer SaaS authentication flows from captured traffic into precise models of how they work — and make deliberate calls about what to publish and what to withhold.</p>
+          <p>I'm an aspiring red teamer focused on <strong>cloud and enterprise attack paths</strong>. My work has one throughline: I don't just run tools against someone else's target — I <strong>build the environment myself</strong>, break it from an external attacker's position, then write the defense that would have stopped me.</p>
+          <p>I come at this from a <strong>software-engineering background</strong>, so the instinct underneath all of it is building. What I really enjoy is reverse-engineering how something works and turning that understanding into a solution — a script, a small tool, a primitive — in Python or whatever the problem calls for.</p>
+          <p>That instinct was shaped on the job. As a returning cybersecurity intern on a large enterprise's security team, I worked a MITRE/NIST-aligned, threat-based risk-assessment methodology, analyzed Active Directory privilege-escalation paths with PowerShell, and triaged reported phishing at scale — the enterprise-defense foundation under the self-directed offensive work below.</p>
+          <p>On the cloud side, I chain real Azure attack paths from anonymous public exposure to subscription-level control — standing up the range in Terraform and fighting the platform constraints of doing that on a locked-down subscription. Right now my research is centered on <strong>cloud and AI security</strong> and penetration testing.</p>
           <p>Everything on this site is self-directed research on infrastructure I own or am authorized to test, framed dual-use: methodology, MITRE ATT&amp;CK mapping, and hardening. The runnable offensive tooling stays private; the understanding and the defenses are what I share.</p>
         </div>
 
@@ -34,7 +37,7 @@ const skills = [
             <ul class="focus-list">
               <li>Cloud penetration testing (Azure)</li>
               <li>Red team operations</li>
-              <li>Identity &amp; SaaS security</li>
+              <li>Active Directory attack paths</li>
               <li>Detection engineering (dual-use)</li>
             </ul>
           </div>
@@ -51,7 +54,7 @@ const skills = [
                 <tr>
                   <td class="sk-name">{s.skill}</td>
                   <td class="sk-detail serif">{s.detail}</td>
-                  <td><a class="sk-ev" href={`/work/${s.ev}/`}>{s.evLabel} →</a></td>
+                  <td>{s.href ? <a class="sk-ev" href={s.href}>{s.evLabel} →</a> : <span class="sk-none">—</span>}</td>
                 </tr>
               ))}
             </tbody>
@@ -70,7 +73,7 @@ const skills = [
           <a href="/contact/" class="btn btn--primary">Contact <svg class="arw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
           <a href={site.socials.github} class="btn" target="_blank" rel="noopener">GitHub</a>
           <a href={site.socials.linkedin} class="btn" target="_blank" rel="noopener">LinkedIn</a>
-          <a href={site.resume} class="btn">Résumé ↓</a>
+          <a href={site.resume} class="btn">Resume ↓</a>
         </div>
       </div>
     </div>
@@ -98,6 +101,7 @@ const skills = [
   .sk-detail { color: var(--fg-2); min-width: 15rem; font-size: 1rem; }
   .sk-ev { font-family: var(--font-mono); font-size: var(--t-small); color: var(--verm-hot); white-space: nowrap; }
   .sk-ev:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .sk-none { font-family: var(--font-mono); font-size: var(--t-small); color: var(--fg-3); }
   .hero-cta { display: flex; flex-wrap: wrap; gap: 0.75rem; }
   .hero-cta .arw { width: 15px; height: 15px; }
 </style>

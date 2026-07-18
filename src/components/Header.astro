@@ -6,8 +6,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
 <header class="site-head">
   <div class="container head-in">
     <a href="/" class="wordmark" aria-label={`${site.name} — home`}>
-      <span class="wm-tick" aria-hidden="true"></span>
-      <span class="wm-name">Blake Grosskopf</span>
+      <img class="wm-logo" src="/logo.png" width="38" height="38" alt={`${site.name} — home`} decoding="async" />
     </a>
 
     <nav class="nav" aria-label="Primary">
@@ -70,20 +69,31 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     border-bottom: 1px solid var(--rule);
   }
   .head-in { display: flex; align-items: center; justify-content: space-between; height: 60px; }
-  .wordmark { display: inline-flex; align-items: center; gap: 0.6rem; }
-  .wm-tick { width: 9px; height: 9px; background: var(--verm); border-radius: 1px; transform: rotate(45deg); flex: none; }
-  .wm-name { font-family: var(--font-display); font-weight: 500; font-size: 1.02rem; letter-spacing: -0.01em; }
+  /* Fixed square viewport; the mark is scaled up inside it to crop the logo's
+     transparent padding so the "BG" reads clearly at small sizes. */
+  .wordmark { display: inline-grid; place-items: center; width: 38px; height: 38px; overflow: hidden; }
+  .wm-logo { width: 100%; height: 100%; display: block; transform: scale(1.4); }
 
   .nav { display: flex; align-items: center; gap: 0.35rem; }
   .nav-list { list-style: none; display: flex; align-items: center; gap: 0.25rem; margin: 0; padding: 0; }
+  /* Underline slide: the accent is an absolutely-positioned bar, so active and
+     inactive links share the exact same box — no vertical shift, no offset. */
   .nav-link {
+    position: relative;
     font-family: var(--font-mono); font-size: var(--t-small); letter-spacing: 0.02em;
-    color: var(--fg-2); padding: 0.5rem 0.75rem; border-radius: var(--r);
-    transition: color var(--dur-1) var(--ease), background var(--dur-1) var(--ease);
+    color: var(--fg-2); padding: 0.5rem 0.4rem;
+    transition: color var(--dur-1) var(--ease);
   }
-  .nav-link:hover { color: var(--fg); background: var(--surface); }
+  .nav-link::after {
+    content: ""; position: absolute; left: 0.4rem; right: 0.4rem; bottom: 2px; height: 2px;
+    background: var(--verm); border-radius: 1px;
+    transform: scaleX(0); transform-origin: left center;
+    transition: transform var(--dur-1) var(--ease);
+  }
+  .nav-link:hover { color: var(--fg); }
+  .nav-link:hover::after,
+  .nav-link.is-active::after { transform: scaleX(1); }
   .nav-link.is-active { color: var(--fg); }
-  .nav-link.is-active::after { content: ""; display: block; height: 1px; margin-top: 2px; background: var(--verm); }
 
   .icon-btn {
     display: inline-grid; place-items: center; width: 38px; height: 38px;
@@ -113,6 +123,6 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     }
     .nav-open .nav-list { transform: translateY(0); opacity: 1; pointer-events: auto; }
     .nav-link { padding: 0.7rem 0.5rem; font-size: var(--t-body); }
-    .nav-link.is-active::after { display: none; }
+    .nav-link::after { display: none; }
   }
 </style>

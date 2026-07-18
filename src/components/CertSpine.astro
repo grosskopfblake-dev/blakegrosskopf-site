@@ -1,8 +1,8 @@
 ---
 import { site } from '../lib/site';
-const stateLabel: Record<string, string> = { held: 'Held', active: 'Active', target: 'Target' };
+const stateLabel: Record<string, string> = { held: 'Completed', active: 'Active', target: 'Target' };
 ---
-<ul class="certs" aria-label="Certification progress">
+<ul class="certs" aria-label="Certification progress" data-reveal>
   {site.certs.map((c, i) => (
     <li class:list={['cert', `is-${c.state}`]}>
       <span class="cert-id">{c.id}</span>
@@ -37,4 +37,40 @@ const stateLabel: Record<string, string> = { held: 'Held', active: 'Active', tar
   .cert.is-target .cert-state::before { background: transparent; border: 1px solid var(--fg-3); }
   .cert-sep { position: absolute; right: -0.5rem; top: 50%; transform: translateY(-50%); color: var(--fg-3); font-size: 0.8rem; z-index: 1; }
   @media (max-width: 560px) { .cert-sep { display: none; } }
+
+  /* ---- Progress: the path traversed so far reads in colour — a completed
+     step's connector is lit, the active step is the hot frontier, targets stay
+     muted. On scroll the spine assembles and the active node keeps a soft
+     heartbeat. Shared observer drives it (.certs.is-in) — no extra JS. ---- */
+  .cert.is-held .cert-sep { color: var(--verm); }
+  .cert.is-active .cert-sep { color: var(--verm-hot); }
+  .cert.is-target .cert-sep { color: var(--fg-3); }
+
+  /* the spine paints immediately; its parts do the animating */
+  .certs[data-reveal] { opacity: 1; transform: none; transition: none; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .certs .cert { opacity: 0; transform: translateY(8px); }
+    .certs.is-in .cert { animation: cert-in var(--dur-2) var(--ease) forwards; }
+    .certs.is-in .cert:nth-child(1) { animation-delay: 60ms; }
+    .certs.is-in .cert:nth-child(2) { animation-delay: 160ms; }
+    .certs.is-in .cert:nth-child(3) { animation-delay: 260ms; }
+    .certs.is-in .cert:nth-child(4) { animation-delay: 360ms; }
+
+    /* connectors draw in after the step they trail, tracing the progress path */
+    .certs .cert-sep { opacity: 0; }
+    .certs.is-in .cert-sep { animation: sep-in var(--dur-2) var(--ease) forwards; }
+    .certs.is-in .cert:nth-child(1) .cert-sep { animation-delay: 220ms; }
+    .certs.is-in .cert:nth-child(2) .cert-sep { animation-delay: 320ms; }
+    .certs.is-in .cert:nth-child(3) .cert-sep { animation-delay: 420ms; }
+
+    /* active step: a slow heartbeat marks "in progress now" */
+    .cert.is-active .cert-state::before { animation: cert-beat 2.4s var(--ease) infinite; }
+  }
+  @keyframes cert-in { to { opacity: 1; transform: none; } }
+  @keyframes sep-in { to { opacity: 1; } }
+  @keyframes cert-beat {
+    0%, 100% { box-shadow: 0 0 0 3px var(--glow); }
+    50% { box-shadow: 0 0 0 6px transparent; }
+  }
 </style>

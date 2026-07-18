@@ -38,12 +38,14 @@ const { src, alt = '', ratio = '16/10', motif = 'grid', label, loading = 'lazy' 
 
         {motif === 'chain' && (
           <g class="ph-chain">
-            <line class="ph-rail" x1="36" y1="100" x2="284" y2="100" />
-            {[36, 98, 160, 222, 284].map((x, i) => (
-              <circle class:list={['ph-dot', i === 3 && 'is-live']} cx={x} cy="100" r={i === 3 ? 9 : 6} />
+            <line class="ph-rail" x1="36" y1="100" x2="222" y2="100" />
+            <line class="ph-rail-rest" x1="222" y1="100" x2="284" y2="100" />
+            {[36, 98, 160].map((x) => (
+              <circle class="ph-dot" cx={x} cy="100" r="6" />
             ))}
             <circle class="ph-halo" cx="222" cy="100" r="16" />
-            <path class="ph-arrow" d="M270 94l10 6-10 6" />
+            <circle class="ph-dot is-live" cx="222" cy="100" r="9" />
+            <circle class="ph-dot is-target" cx="284" cy="100" r="6" />
           </g>
         )}
         {motif === 'terminal' && (
@@ -91,12 +93,15 @@ const { src, alt = '', ratio = '16/10', motif = 'grid', label, loading = 'lazy' 
   .ph-fill-2 { fill: var(--surface-2); }
   .ph-lines line { stroke: var(--rule); stroke-width: 1; opacity: 0.55; }
 
-  /* chain motif */
-  .ph-rail { stroke: var(--rule-2); stroke-width: 2; }
-  .ph-dot { fill: var(--surface); stroke: var(--rule-2); stroke-width: 2; }
-  .ph-dot.is-live { stroke: var(--verm); }
-  .ph-halo { fill: none; stroke: var(--verm); stroke-width: 1.5; opacity: 0.4; }
-  .ph-arrow { fill: none; stroke: var(--verm); stroke-width: 2; }
+  /* chain motif — attack path: the traversed segment is lit, the live node is
+     the frontier, the target stays muted (mirrors the KillChain + cert-spine
+     progress language). No floating arrow. */
+  .ph-rail { stroke: var(--verm); stroke-width: 2; opacity: 0.85; }
+  .ph-rail-rest { stroke: var(--rule-2); stroke-width: 2; }
+  .ph-dot { fill: var(--surface); stroke: var(--verm); stroke-width: 2; }
+  .ph-dot.is-live { fill: var(--verm); }
+  .ph-dot.is-target { stroke: var(--rule-2); }
+  .ph-halo { fill: none; stroke: var(--verm); stroke-width: 1.5; opacity: 0.35; }
 
   /* terminal motif */
   .ph-win { fill: var(--bg); stroke: var(--rule); stroke-width: 1; }

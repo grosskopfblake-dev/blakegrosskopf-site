@@ -1,0 +1,220 @@
+---
+import { site } from '../lib/site';
+---
+<div id="resume-modal" hidden role="dialog" aria-modal="true" aria-labelledby="resume-modal-title" data-resume-src={site.resume}>
+  <div id="resume-modal-backdrop" class="rm-backdrop"></div>
+  <div class="rm-panel" role="document">
+    <div class="rm-header">
+      <h2 id="resume-modal-title" class="rm-title">Resume</h2>
+      <div class="rm-actions">
+        <a class="btn btn--primary" href={site.resume} download data-resume-download>
+          Download
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3v12M6 11l6 6 6-6M5 21h14"/></svg>
+        </a>
+        <button type="button" id="resume-modal-close" class="rm-close" aria-label="Close resume">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="rm-body">
+      <iframe src={site.resume} title="Blake Grosskopf resume"></iframe>
+    </div>
+  </div>
+</div>
+
+<style>
+  #resume-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: grid;
+    place-items: center;
+    padding: 2.5rem 1.25rem;
+  }
+  #resume-modal[hidden] { display: none; }
+
+  .rm-backdrop {
+    position: fixed;
+    inset: 0;
+    background: color-mix(in srgb, var(--bg) 78%, transparent);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+
+  .rm-panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: min(920px, 94vw);
+    height: min(88vh, 1000px);
+    background: var(--surface);
+    border: 1px solid var(--rule-2);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    opacity: 0;
+    transform: scale(0.97) translateY(6px);
+    transition: opacity var(--dur-2) var(--ease), transform var(--dur-2) var(--ease);
+  }
+  #resume-modal.is-open .rm-panel {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+
+  .rm-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.9rem 1.1rem;
+    border-bottom: 1px solid var(--rule);
+    flex: 0 0 auto;
+  }
+
+  .rm-title {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--fg);
+    margin: 0;
+  }
+
+  .rm-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .rm-actions .btn svg { width: 16px; height: 16px; }
+
+  .rm-close {
+    display: inline-grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--r);
+    border: 1px solid transparent;
+    color: var(--fg-2);
+    transition: color var(--dur-1) var(--ease), background var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease);
+  }
+  .rm-close:hover { color: var(--fg); background: var(--surface-2); border-color: var(--rule-2); }
+  .rm-close svg { width: 18px; height: 18px; }
+
+  .rm-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    background: var(--surface-2);
+  }
+
+  .rm-body iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: var(--surface-2);
+  }
+
+  @media (max-width: 560px) {
+    #resume-modal { padding: 0; }
+    .rm-panel {
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      border-radius: 0;
+      border-width: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rm-panel { transition: none; }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var modal = document.getElementById('resume-modal');
+    if (!modal) return;
+    var resumeSrc = modal.getAttribute('data-resume-src');
+    var backdrop = document.getElementById('resume-modal-backdrop');
+    var closeBtn = document.getElementById('resume-modal-close');
+    var panel = modal.querySelector('.rm-panel');
+    var lastTrigger = null;
+
+    function focusableEls() {
+      return Array.prototype.slice.call(
+        modal.querySelectorAll('a[href], button:not([disabled]), iframe, [tabindex]:not([tabindex="-1"])')
+      ).filter(function (el) { return el.offsetParent !== null || el === document.activeElement; });
+    }
+
+    function openModal(trigger) {
+      lastTrigger = trigger || null;
+      modal.hidden = false;
+      document.body.dataset.rmPrevOverflow = document.body.style.overflow || '';
+      document.body.style.overflow = 'hidden';
+      // Force reflow so the open transition runs.
+      void modal.offsetWidth;
+      modal.classList.add('is-open');
+      if (closeBtn) closeBtn.focus();
+      document.addEventListener('keydown', onKeydown, true);
+    }
+
+    function closeModal() {
+      modal.classList.remove('is-open');
+      document.body.style.overflow = document.body.dataset.rmPrevOverflow || '';
+      delete document.body.dataset.rmPrevOverflow;
+      document.removeEventListener('keydown', onKeydown, true);
+
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var finish = function () {
+        modal.hidden = true;
+        if (lastTrigger && typeof lastTrigger.focus === 'function') lastTrigger.focus();
+        lastTrigger = null;
+      };
+      if (reduce || !panel) {
+        finish();
+      } else {
+        var done = false;
+        var onEnd = function () {
+          if (done) return;
+          done = true;
+          panel.removeEventListener('transitionend', onEnd);
+          finish();
+        };
+        panel.addEventListener('transitionend', onEnd);
+        // Fallback in case transitionend doesn't fire.
+        setTimeout(onEnd, 400);
+      }
+    }
+
+    function onKeydown(e) {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        closeModal();
+        return;
+      }
+      if (e.key === 'Tab') {
+        var items = focusableEls();
+        if (!items.length) return;
+        var first = items[0];
+        var last = items[items.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    }
+
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (backdrop) backdrop.addEventListener('click', closeModal);
+
+    document.addEventListener('click', function (e) {
+      var link = e.target.closest ? e.target.closest('a[href="' + resumeSrc + '"]') : null;
+      if (!link || link.hasAttribute('data-resume-download')) return;
+      e.preventDefault();
+      openModal(link);
+    });
+  })();
+</script>

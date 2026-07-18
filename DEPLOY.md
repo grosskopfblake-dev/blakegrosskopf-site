@@ -81,7 +81,7 @@ canonical URL and Open Graph preview (the `site` value in `astro.config.mjs` is 
 ## Before the first public deploy
 
 - [ ] Site is in its **own public repo**, not the vault.
-- [ ] `okta-oie-credential-oracle` repo is **public** (the Okta case study links it).
+- [ ] Any repo linked from a case study (via its `links` frontmatter) is **public**.
 - [ ] Drop a real OG image at `public/og.png` if you want richer social cards (an SVG OG
       is in place; some scrapers prefer PNG). Then set `image` defaults in `Base.astro`.
-- [ ] Add `public/blake-grosskopf-resume.pdf` to enable the résumé download.
+- [ ] Add `public/blake-grosskopf-resume.pdf` to enable the resume download.

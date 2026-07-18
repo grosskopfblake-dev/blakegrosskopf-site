@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import ResumeModal from '../components/ResumeModal.astro';
 import { site } from '../lib/site';
 
 interface Props {
@@ -39,8 +40,10 @@ const ogImage = new URL(image, site.url).href;
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
 
-    <!-- If JS is unavailable, the scroll-reveal never fires — keep content visible. -->
-    <noscript><style>[data-reveal]{opacity:1 !important;transform:none !important;}</style></noscript>
+    <!-- If JS is unavailable, the scroll-reveal never fires — keep content visible.
+         Also un-hide the staggered children (killchain nodes, cert cards) that
+         start hidden for their entrance animation. -->
+    <noscript><style>[data-reveal],.kc-node,.cert,.cert-sep{opacity:1 !important;transform:none !important;}</style></noscript>
 
     <link rel="preload" href="/fonts/space-grotesk.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin />
@@ -72,6 +75,7 @@ const ogImage = new URL(image, site.url).href;
       <slot />
     </main>
     <Footer />
+    <ResumeModal />
 
     <!-- Scroll reveal: single observer for all [data-reveal] elements. -->
     <script is:inline>

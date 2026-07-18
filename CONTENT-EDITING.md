@@ -18,8 +18,8 @@ you edit by hand or in another Claude session.
 | Preview locally | `npm run dev` → open http://localhost:4321 |
 | Ship it | `npm run build` → deploy `dist/` (see DEPLOY.md). |
 
-The **filename becomes the URL**. `work/okta-oie-credential-oracle.md` →
-`/work/okta-oie-credential-oracle/`. Use kebab-case, no dates in the name.
+The **filename becomes the URL**. `work/operation-vermillion-drift.md` →
+`/work/operation-vermillion-drift/`. Use kebab-case, no dates in the name.
 Files starting with `_` (like the templates) are ignored.
 
 ---
@@ -88,10 +88,10 @@ motif, picked by lane) is intentionally good enough to launch with.
 ## Site-wide settings
 
 `src/lib/site.ts` is the one place for: name, role, tagline, pitch, **email**, GitHub /
-LinkedIn, the **résumé path**, the nav list, and the **cert spine** (each cert's
+LinkedIn, the **resume path**, the nav list, and the **cert spine** (each cert's
 `state` is `held` / `active` / `target`). Change it here and it updates everywhere.
 
-**Résumé:** drop your PDF at `public/blake-grosskopf-resume.pdf` (the path in
+**Resume:** drop your PDF at `public/blake-grosskopf-resume.pdf` (the path in
 `site.ts`) and the download links light up.
 
 ---

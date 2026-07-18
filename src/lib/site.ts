@@ -3,12 +3,12 @@ export const site = {
   name: 'Blake Grosskopf',
   domain: 'blakegrosskopf.com',
   url: 'https://blakegrosskopf.com',
-  role: 'Cloud & Identity Offensive Security Researcher',
-  tagline: 'I build and break cloud identity systems — then document both sides.',
+  role: 'Offensive Security Researcher',
+  tagline: 'I build cloud and enterprise labs, then break them end-to-end — and write the defense that stops me.',
   description:
-    'Independent offensive-security researcher. Cloud attack paths from public exposure to subscription control, SaaS auth reverse-engineering, and the defenses that stop them.',
+    'Aspiring red teamer, currently shadowing a red team. I build cloud and enterprise labs from scratch, break them end-to-end, and write the detections and defenses that stop the attack.',
   pitch:
-    'I build and break cloud identity systems end-to-end — reverse-engineering SaaS auth flows into custom tooling, and chaining real cloud attack paths from public exposure to subscription-level control — then document both the offense and the defense.',
+    'An aspiring red teamer, shadowing a red team while running my own labs. I stand up cloud and enterprise environments from scratch, attack them from an external position all the way to full control, then write the defense that would have stopped me.',
   email: 'grosskopfblake@gmail.com',
   socials: {
     github: 'https://github.com/grosskopfblake-dev',
@@ -26,9 +26,9 @@ export const site = {
   ],
   // Cert spine — held → active → target.
   certs: [
-    { id: 'AZ-900', name: 'Azure Fundamentals', state: 'held' as const },
-    { id: 'SC-900', name: 'Security, Compliance & Identity Fundamentals', state: 'active' as const },
-    { id: 'SC-500', name: 'Cloud & AI Security Engineer', state: 'active' as const },
+    { id: 'SC-900', name: 'Security, Compliance & Identity Fundamentals', state: 'held' as const },
+    { id: 'PNPT', name: 'Practical Network Penetration Tester', state: 'active' as const },
+    { id: 'SC-500', name: 'Cloud & AI Security Engineer', state: 'target' as const },
     { id: 'CARTP', name: 'Cloud Attack & Red Team Professional', state: 'target' as const },
   ],
 };

@@ -29,7 +29,7 @@ const fmtDate = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', mo
     <div class="container hero-in">
       <p class="eyebrow eyebrow--rule" data-reveal>{site.name} · {site.role}</p>
       <h1 class="hero-h" data-reveal style="--reveal-delay:60ms">
-        I build and break cloud identity systems —<span class="hero-em"> then document both sides.</span>
+        I build cloud and enterprise labs, then break them —<span class="hero-em"> and write the defense that stops me.</span>
       </h1>
       <p class="hero-lead serif" data-reveal style="--reveal-delay:120ms">{site.pitch}</p>
       <div class="hero-cta" data-reveal style="--reveal-delay:180ms">
@@ -122,7 +122,7 @@ const fmtDate = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', mo
   <!-- ===== CONTACT CTA ===== -->
   <section class="section contact-cta" aria-labelledby="cta-h">
     <div class="container cta-in" data-reveal>
-      <h2 id="cta-h">Hiring for cloud pentest, red team, or identity security?</h2>
+      <h2 id="cta-h">Hiring for red team, cloud pentest, or detection work?</h2>
       <p class="serif cta-lead">I'm open to roles and collaboration. The fastest way to gauge fit is to read a case study — then say hello.</p>
       <div class="hero-cta">
         <a href="/contact/" class="btn btn--primary">Get in touch <svg class="arw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
@@ -194,4 +194,21 @@ const fmtDate = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', mo
   .cta-in { max-width: 40ch; }
   .cta-in h2 { font-size: var(--t-h2); }
   .cta-lead { margin-top: 1rem; color: var(--fg-2); font-size: 1.15rem; line-height: 1.5; max-width: 46ch; }
+
+  /* ---- Signature: the hero KillChain assembles left→right on reveal. Driven
+     entirely by the shared scroll-reveal (.hero-chain.is-in) — no extra JS.
+     Motion opt-in only. ---- */
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-chain :global(.kc-node) { opacity: 0; transform: translateY(10px); }
+    .hero-chain.is-in :global(.kc-node) { animation: kc-assemble var(--dur-3) var(--ease) forwards; }
+    .hero-chain.is-in :global(.kc-node:nth-child(1)) { animation-delay: 120ms; }
+    .hero-chain.is-in :global(.kc-node:nth-child(2)) { animation-delay: 200ms; }
+    .hero-chain.is-in :global(.kc-node:nth-child(3)) { animation-delay: 280ms; }
+    .hero-chain.is-in :global(.kc-node:nth-child(4)) { animation-delay: 360ms; }
+    .hero-chain.is-in :global(.kc-node:nth-child(5)) { animation-delay: 440ms; }
+    .hero-chain.is-in :global(.kc-node:nth-child(6)) { animation-delay: 520ms; }
+    .hero-chain.is-in :global(.kc-node:nth-child(7)) { animation-delay: 600ms; }
+    .hero-chain.is-in :global(.kc-node:nth-child(8)) { animation-delay: 680ms; }
+  }
+  @keyframes kc-assemble { to { opacity: 1; transform: none; } }
 </style>
