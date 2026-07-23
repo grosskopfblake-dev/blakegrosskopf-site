@@ -71,7 +71,10 @@ const { steps, caption, note, variant = 'inline' } = Astro.props;
      so the arrow is never buried by a neighbouring box on any platform. */
   .kc-arrow {
     position: absolute; left: -7px; top: 50%; transform: translateY(-50%);
-    width: 13px; height: 13px; color: var(--fg-3); z-index: 2; background: var(--bg);
+    width: 13px; height: 13px; color: var(--fg-3); z-index: 2;
+    /* Erase the divider line behind the glyph using the box surface itself, so
+       the arrow reads as floating on the boxes — no mismatched dark patch. */
+    background: var(--surface);
   }
   .kc-node.is-live .kc-arrow { color: var(--verm); }
   .kc-pulse {
