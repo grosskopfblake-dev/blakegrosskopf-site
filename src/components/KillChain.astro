@@ -25,15 +25,15 @@ const { steps, caption, note, variant = 'inline' } = Astro.props;
   <ol class="kc-rail">
     {steps.map((s, i) => (
       <li class:list={['kc-node', s.live && 'is-live']}>
-        <span class="kc-n">{String(i + 1).padStart(2, '0')}</span>
-        {s.live && <span class="kc-pulse" aria-hidden="true"></span>}
-        <span class="kc-t">{s.title}</span>
-        {s.mitre && <span class="kc-m">{s.mitre}</span>}
-        {i < steps.length - 1 && (
+        {i > 0 && (
           <svg class="kc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <path d="M5 12h14M13 6l6 6-6 6" />
           </svg>
         )}
+        <span class="kc-n">{String(i + 1).padStart(2, '0')}</span>
+        {s.live && <span class="kc-pulse" aria-hidden="true"></span>}
+        <span class="kc-t">{s.title}</span>
+        {s.mitre && <span class="kc-m">{s.mitre}</span>}
       </li>
     ))}
   </ol>
@@ -66,8 +66,11 @@ const { steps, caption, note, variant = 'inline' } = Astro.props;
   .kc-node.is-live .kc-n { color: var(--verm-hot); }
   .kc-t { display: block; margin-top: 0.5rem; font-size: 0.9rem; font-weight: 500; line-height: 1.2; letter-spacing: -0.01em; }
   .kc-m { display: block; margin-top: 0.5rem; font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.04em; color: var(--fg-3); }
+  /* Connector belongs to the box on the RIGHT of each seam and overflows LEFT.
+     Later siblings always paint above earlier ones — stacking context or not —
+     so the arrow is never buried by a neighbouring box on any platform. */
   .kc-arrow {
-    position: absolute; right: -7px; top: 50%; transform: translateY(-50%);
+    position: absolute; left: -7px; top: 50%; transform: translateY(-50%);
     width: 13px; height: 13px; color: var(--fg-3); z-index: 2; background: var(--bg);
   }
   .kc-node.is-live .kc-arrow { color: var(--verm); }
@@ -99,9 +102,9 @@ const { steps, caption, note, variant = 'inline' } = Astro.props;
       padding: 0.95rem 1rem;
     }
     .kc-node.is-live { border-color: var(--verm); }
-    /* down-arrow sits centered in the gap below each box (last box has none) */
+    /* down-arrow sits centered in the gap above each box (first box has none) */
     .kc-arrow {
-      right: 50%; top: auto; bottom: -1.15rem; transform: translateX(50%) rotate(90deg);
+      left: 50%; top: -1.15rem; bottom: auto; transform: translateX(-50%) rotate(90deg);
       width: 18px; height: 18px; color: var(--fg-2); background: transparent;
     }
     .kc-node.is-live .kc-arrow { color: var(--verm); }
