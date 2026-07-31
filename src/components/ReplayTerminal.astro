@@ -1,0 +1,508 @@
+---
+/*
+  ReplayTerminal — an interactive walk-through of a case study's kill chain.
+
+  This is the evidence section for engagements that have no screenshots: the
+  reader re-runs the attack instead of squinting at a capture. Stage titles and
+  ATT&CK IDs come from the entry's `killchain` frontmatter, so the replay and
+  the written case study can never disagree; the shell mechanics come from
+  src/lib/drift-replay.ts.
+
+  Static, no dependencies, no network. Degrades to a readable transcript with
+  JS off, and to a tap-through with no keyboard.
+
+  Props:
+    steps:  killchain steps from frontmatter (title, mitre)
+    replay: the Replay record for this slug
+    id?:    unique DOM id when more than one lives on a page
+*/
+import type { Replay } from '../lib/drift-replay';
+
+interface Step { title: string; mitre?: string; detail?: string; live?: boolean; }
+interface Props { steps: Step[]; replay: Replay; id?: string }
+const { steps, replay, id = 'replay' } = Astro.props;
+
+/* Merge frontmatter (title/mitre) with the shell data (cmd/output/hints) so the
+   client gets one flat array. `< ` is escaped — this lands inside a script tag. */
+const payload = JSON.stringify({
+  host: replay.host,
+  intro: replay.intro,
+  outro: replay.outro,
+  stages: replay.stages.map((s, i) => ({
+    ...s,
+    title: steps[i]?.title ?? `Stage ${i + 1}`,
+    mitre: steps[i]?.mitre ?? '',
+  })),
+}).replace(/</g, '\\u003c');
+---
+
+<section class="rt" id={id} aria-labelledby={`${id}-h`} data-replay>
+  <div class="rt-head">
+    <h2 id={`${id}-h`} class="block-h"><span class="marker">C</span>Walk the chain</h2>
+    <p class="rt-lead serif">
+      No screenshots for this one — a replay instead. Eight stages, the same
+      order they happened in, including the dead end I hit at stage 05. Type the
+      move or press <kbd>Tab</kbd> to autofill it.
+    </p>
+  </div>
+
+  <div class="rt-frame">
+    <!-- progress rail: one segment per kill-chain node -->
+    <ol class="rt-rail" aria-label="Replay progress">
+      {steps.map((s, i) => (
+        <li class="rt-seg" data-seg={i}>
+          <span class="rt-seg-n">{String(i + 1).padStart(2, '0')}</span>
+          <span class="rt-seg-t">{s.title}</span>
+          {s.mitre && <span class="rt-seg-m">{s.mitre}</span>}
+        </li>
+      ))}
+    </ol>
+
+    <div class="rt-bar">
+      <span class="rt-bar-l">vermillion-drift · replay</span>
+      <span class="rt-bar-r"><span data-count>0</span>/{steps.length} cleared</span>
+    </div>
+
+    <!-- transcript -->
+    <div class="rt-log" data-log role="log" aria-live="polite" aria-atomic="false" tabindex="0">
+      <noscript>
+        <p class="rt-line rt-dim">
+          The interactive replay needs JavaScript. The same eight stages are
+          described in full in the write-up above and in the findings table below.
+        </p>
+      </noscript>
+    </div>
+
+    <!-- input -->
+    <form class="rt-input" data-form autocomplete="off">
+      <label class="sr-only" for={`${id}-cmd`}>Enter a command</label>
+      <span class="rt-prompt" data-prompt aria-hidden="true">{replay.host}:~$</span>
+      <input
+        class="rt-field mono"
+        id={`${id}-cmd`}
+        data-field
+        type="text"
+        spellcheck="false"
+        autocapitalize="off"
+        autocorrect="off"
+        placeholder="type a command…"
+      />
+      <button class="rt-go" type="submit" aria-label="Run command">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+    </form>
+
+    <div class="rt-keys">
+      <button type="button" class="rt-key" data-do="autofill">⇥ autofill</button>
+      <button type="button" class="rt-key" data-do="hint">hint</button>
+      <button type="button" class="rt-key" data-do="help">help</button>
+      <button type="button" class="rt-key" data-do="restart">restart</button>
+    </div>
+  </div>
+</section>
+
+<script type="application/json" data-replay-data set:html={payload} is:inline></script>
+
+<script>
+  (function () {
+    const root = document.querySelector('[data-replay]');
+    const dataEl = document.querySelector('[data-replay-data]');
+    if (!root || !dataEl) return;
+
+    const D = JSON.parse(dataEl.textContent || '{}');
+    const log = root.querySelector('[data-log]');
+    const form = root.querySelector('[data-form]');
+    const field = root.querySelector('[data-field]');
+    const promptEl = root.querySelector('[data-prompt]');
+    const countEl = root.querySelector('[data-count]');
+    const segs = Array.from(root.querySelectorAll('[data-seg]'));
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const norm = (s) => s.toLowerCase().replace(/\s+/g, ' ').trim();
+
+    let stage = 0;        // index of the current stage
+    let hints = 0;        // hints spent on the current stage
+    let prompt = D.host;
+    let busy = false;     // true while the typewriter is running
+    const hist = [];
+    let hIdx = -1;
+
+    /* ---------- output ---------- */
+
+    function cls(line) {
+      if (line.startsWith('+ ')) return 'rt-ok';
+      if (line.startsWith('! ')) return 'rt-warn';
+      if (line.startsWith('· ')) return 'rt-dim';
+      return '';
+    }
+
+    function put(line, extra) {
+      const p = document.createElement('p');
+      p.className = 'rt-line ' + (extra || cls(line));
+      p.textContent = line === '' ? ' ' : line;
+      log.appendChild(p);
+      log.scrollTop = log.scrollHeight;
+      return p;
+    }
+
+    function echo(cmd) {
+      const p = document.createElement('p');
+      p.className = 'rt-line rt-echo';
+      const s = document.createElement('span');
+      s.className = 'rt-echo-p';
+      s.textContent = prompt + ':~$ ';
+      p.appendChild(s);
+      p.appendChild(document.createTextNode(cmd));
+      log.appendChild(p);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    /* Print a block line-by-line. Reduced motion prints it instantly. */
+    function print(lines, done) {
+      if (reduce) {
+        lines.forEach((l) => put(l));
+        if (done) done();
+        return;
+      }
+      busy = true;
+      field.readOnly = true;   // readOnly, not disabled — disabling would drop focus
+      let i = 0;
+      (function step() {
+        if (i >= lines.length) {
+          busy = false;
+          field.readOnly = false;
+          if (done) done();
+          return;
+        }
+        put(lines[i++]);
+        setTimeout(step, 26);
+      })();
+    }
+
+    /* ---------- stage flow ---------- */
+
+    function announce() {
+      if (stage >= D.stages.length) return;
+      const s = D.stages[stage];
+      const n = String(stage + 1).padStart(2, '0');
+      print([
+        '',
+        `[ STAGE ${n} ] ${s.title}${s.mitre ? '  ·  ' + s.mitre : ''}`,
+        `  ${s.objective}`,
+      ]);
+    }
+
+    function paintRail() {
+      segs.forEach((el, i) => {
+        el.classList.toggle('is-done', i < stage);
+        el.classList.toggle('is-now', i === stage);
+      });
+      countEl.textContent = String(Math.min(stage, D.stages.length));
+    }
+
+    function clearStage() {
+      const s = D.stages[stage];
+      print(s.out, () => {
+        if (s.lesson) print(['', '· ' + s.lesson], after);
+        else after();
+      });
+      function after() {
+        if (s.setPrompt) { prompt = s.setPrompt; promptEl.textContent = prompt + ':~$'; }
+        stage += 1;
+        hints = 0;
+        paintRail();
+        if (stage >= D.stages.length) print(D.outro, finish);
+        else announce();
+      }
+    }
+
+    function finish() {
+      const box = document.createElement('div');
+      box.className = 'rt-done';
+      box.innerHTML =
+        '<p class="rt-done-h">Chain complete</p>' +
+        '<p class="rt-done-b">Anonymous public URL to resource-group Contributor, ' +
+        'eight stages, no credentials to start with.</p>';
+      log.appendChild(box);
+      log.scrollTop = log.scrollHeight;
+      field.placeholder = 'type `restart` to run it again';
+    }
+
+    /* ---------- built-in commands ---------- */
+
+    const builtins = {
+      help() {
+        print([
+          '',
+          '  help      this list',
+          '  hint      nudge for the current stage; twice reveals the move',
+          '  status    where you are in the chain',
+          '  skip      clear the current stage without solving it',
+          '  restart   back to stage 01',
+          '  clear     wipe the transcript',
+          '  whoami    who you are on this box',
+          '',
+          '· Tab autofills the move. Up/Down walks history. Esc leaves the field.',
+        ]);
+      },
+      hint() {
+        if (stage >= D.stages.length) { print(['· Chain is done. `restart` to run it again.']); return; }
+        const s = D.stages[stage];
+        hints += 1;
+        if (hints === 1) print(['', '· ' + s.hint]);
+        else print(['', '· The move is:', '    ' + s.cmd, '· Press Tab to fill it in.']);
+      },
+      status() {
+        if (stage >= D.stages.length) { print(['+ 8/8 — chain complete.']); return; }
+        const s = D.stages[stage];
+        print([
+          '',
+          `  stage      ${String(stage + 1).padStart(2, '0')} of ${D.stages.length}`,
+          `  objective  ${s.title}`,
+          `  att&ck     ${s.mitre || '—'}`,
+          `  host       ${prompt}`,
+        ]);
+      },
+      skip() {
+        if (stage >= D.stages.length) { print(['· Nothing left to skip.']); return; }
+        print(['· Skipped. Here is what that move returned:'], clearStage);
+      },
+      restart() {
+        stage = 0; hints = 0; prompt = D.host;
+        promptEl.textContent = prompt + ':~$';
+        log.innerHTML = '';
+        field.placeholder = 'type a command…';
+        paintRail();
+        print(D.intro, announce);
+      },
+      clear() { log.innerHTML = ''; },
+      whoami() {
+        print([prompt === D.host ? 'guest — no credentials, no session, no account.' : 'azureuser — via a private key that should never have been in a blob.']);
+      },
+    };
+
+    /* ---------- dispatch ---------- */
+
+    function run(raw) {
+      const cmd = raw.trim();
+      if (!cmd) return;
+      echo(cmd);
+      hist.unshift(cmd);
+      hIdx = -1;
+
+      /* hasOwnProperty, not `in` — otherwise `constructor` or `toString`
+         resolve up the prototype chain and blow up the terminal. */
+      const key = norm(cmd).split(' ')[0];
+      if (Object.prototype.hasOwnProperty.call(builtins, key)) { builtins[key](); return; }
+
+      if (stage >= D.stages.length) {
+        print(['· Chain complete. `restart` to run it again.']);
+        return;
+      }
+
+      const s = D.stages[stage];
+      const n = norm(cmd);
+      const hit = (needs) => needs.every((x) => n.includes(norm(x)));
+
+      /* asides answer without advancing — dead ends and preludes */
+      const aside = (s.asides || []).find((a) => hit(a.needs));
+      if (aside) {
+        print(aside.out, () => {
+          if (aside.setPrompt) {
+            prompt = aside.setPrompt;
+            promptEl.textContent = prompt + ':~$';
+          }
+        });
+        return;
+      }
+
+      if (hit(s.needs)) { clearStage(); return; }
+
+      print([
+        `! ${key}: that does not move stage ${String(stage + 1).padStart(2, '0')} forward.`,
+        '· `hint` for a nudge, Tab to autofill the move.',
+      ]);
+    }
+
+    /* ---------- wiring ---------- */
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (busy) return;
+      const v = field.value;
+      field.value = '';
+      run(v);
+    });
+
+    field.addEventListener('keydown', (e) => {
+      /* Tab autofills — but Shift+Tab must still escape, or keyboard users are
+         trapped in the field. Esc is the forward exit. */
+      if (e.key === 'Tab' && !e.shiftKey) {
+        e.preventDefault();
+        if (stage < D.stages.length) field.value = D.stages[stage].cmd;
+        return;
+      }
+      if (e.key === 'Escape') { field.blur(); return; }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (hIdx < hist.length - 1) field.value = hist[++hIdx];
+        return;
+      }
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (hIdx > 0) field.value = hist[--hIdx];
+        else { hIdx = -1; field.value = ''; }
+      }
+    });
+
+    root.querySelectorAll('[data-do]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        if (busy) return;
+        const what = btn.getAttribute('data-do');
+        if (what === 'autofill') {
+          if (stage < D.stages.length) field.value = D.stages[stage].cmd;
+          field.focus();
+          return;
+        }
+        echo(what);
+        builtins[what]();
+      });
+    });
+
+    /* Clicking the transcript focuses the input, the way a terminal behaves —
+       but never steal focus on load, this sits mid-page. */
+    log.addEventListener('click', () => {
+      if (window.getSelection().toString()) return;
+      field.focus();
+    });
+
+    /* Boot on first scroll into view so the banner animates when it is seen. */
+    let booted = false;
+    function boot() {
+      if (booted) return;
+      booted = true;
+      paintRail();
+      print(D.intro, announce);
+    }
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((e) => { if (e.isIntersecting) { boot(); io.disconnect(); } });
+      }, { threshold: 0.15 });
+      io.observe(root);
+    } else boot();
+  })();
+</script>
+
+<style>
+  .rt { margin-top: clamp(2.5rem, 6vw, 4rem); }
+  .rt-head { margin-bottom: 1.5rem; }
+  .rt-lead { margin-top: 0.9rem; max-width: 58ch; color: var(--fg-2); font-size: 1.05rem; line-height: 1.55; }
+  .rt-lead kbd {
+    font-family: var(--font-mono); font-size: 0.8em; color: var(--fg);
+    border: 1px solid var(--rule-2); border-bottom-width: 2px; border-radius: var(--r);
+    padding: 0.1em 0.4em; background: var(--surface-2);
+  }
+
+  .rt-frame {
+    border: 1px solid var(--rule); border-radius: var(--r-lg);
+    background: var(--surface); overflow: hidden;
+    /* Transcript status colours. The shared --sev-* tokens are tuned for the
+       severity chips on dark; on the light theme they fall under 4.5:1 against
+       --surface, so the light values are darkened here. */
+    --rt-ok: var(--sev-low);
+    --rt-warn: var(--sev-high);
+  }
+  :global(:root[data-theme='light']) .rt-frame { --rt-ok: #2E6355; --rt-warn: #8A4E12; }
+  @media (prefers-color-scheme: light) {
+    :global(:root:not([data-theme])) .rt-frame { --rt-ok: #2E6355; --rt-warn: #8A4E12; }
+  }
+
+  /* progress rail */
+  .rt-rail { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(8, 1fr); border-bottom: 1px solid var(--rule); }
+  .rt-seg {
+    min-width: 0; padding: 0.6rem 0.55rem 0.7rem; border-right: 1px solid var(--rule);
+    border-top: 2px solid var(--rule-2);
+    transition: border-color var(--dur-2) var(--ease), background var(--dur-2) var(--ease);
+  }
+  .rt-seg:last-child { border-right: 0; }
+  .rt-seg.is-done { border-top-color: var(--verm); }
+  .rt-seg.is-now { border-top-color: var(--verm-hot); background: linear-gradient(180deg, var(--glow), transparent 80%); }
+  .rt-seg-n { font-family: var(--font-mono); font-size: var(--t-micro); color: var(--fg-3); }
+  .rt-seg.is-done .rt-seg-n, .rt-seg.is-now .rt-seg-n { color: var(--verm-hot); }
+  .rt-seg-t { display: block; margin-top: 0.25rem; font-size: 0.72rem; line-height: 1.2; letter-spacing: -0.01em; color: var(--fg-2); }
+  .rt-seg.is-done .rt-seg-t, .rt-seg.is-now .rt-seg-t { color: var(--fg); }
+  .rt-seg-m { display: none; font-family: var(--font-mono); font-size: 0.6rem; margin-top: 0.3rem; color: var(--fg-3); }
+  @media (min-width: 1000px) { .rt-seg-m { display: block; } }
+
+  .rt-bar {
+    display: flex; justify-content: space-between; gap: 1rem;
+    padding: 0.5rem 0.9rem; border-bottom: 1px solid var(--rule); background: var(--surface-2);
+    font-family: var(--font-mono); font-size: var(--t-micro); letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg-3);
+  }
+  .rt-bar-r { color: var(--verm-hot); }
+
+  /* transcript */
+  .rt-log {
+    height: 25rem; overflow-y: auto; padding: 1rem 1.1rem;
+    font-family: var(--font-mono); font-size: var(--t-small); line-height: 1.6;
+    scrollbar-width: thin;
+  }
+  .rt-log:focus-visible { outline: 2px solid var(--verm); outline-offset: -2px; }
+
+  /* Transcript lines are built by JS at runtime, so they never receive Astro's
+     scoping attribute. These must be :global(), nested under the scoped .rt-log
+     so they stay encapsulated in practice. Custom properties still inherit down
+     from .rt-frame, so var(--rt-ok) resolves normally. */
+  .rt-log :global(.rt-line) { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--fg-2); }
+  .rt-log :global(.rt-echo) { color: var(--fg); margin-top: 0.35rem; }
+  .rt-log :global(.rt-echo-p) { color: var(--verm-hot); }
+  .rt-log :global(.rt-ok) { color: var(--rt-ok); }
+  .rt-log :global(.rt-warn) { color: var(--rt-warn); }
+  .rt-log :global(.rt-dim) { color: var(--fg-3); }
+
+  .rt-log :global(.rt-done) { margin-top: 1rem; border-left: 2px solid var(--verm); padding: 0.4rem 0 0.4rem 1rem; }
+  .rt-log :global(.rt-done-h) { margin: 0; font-family: var(--font-display); font-weight: 500; font-size: 1.1rem; color: var(--fg); }
+  .rt-log :global(.rt-done-b) { margin: 0.3rem 0 0; font-family: var(--font-serif); font-size: 1rem; line-height: 1.5; color: var(--fg-2); }
+
+  /* input */
+  .rt-input { display: flex; align-items: center; gap: 0.6rem; padding: 0.7rem 1.1rem; border-top: 1px solid var(--rule); background: var(--surface-2); }
+  .rt-prompt { font-family: var(--font-mono); font-size: var(--t-small); color: var(--verm-hot); white-space: nowrap; }
+  .rt-field {
+    flex: 1; min-width: 0; background: none; border: 0; color: var(--fg);
+    font-size: var(--t-small); padding: 0.25rem 0;
+  }
+  .rt-field:focus { outline: none; }
+  .rt-field::placeholder { color: var(--fg-3); }
+  .rt-field:disabled { opacity: 0.5; }
+  .rt-go { display: inline-flex; background: none; border: 0; color: var(--fg-3); cursor: pointer; padding: 0.2rem; }
+  .rt-go svg { width: 16px; height: 16px; }
+  .rt-go:hover { color: var(--verm-hot); }
+
+  .rt-keys { display: flex; flex-wrap: wrap; gap: 0.4rem; padding: 0 1.1rem 0.9rem; background: var(--surface-2); }
+  .rt-key {
+    font-family: var(--font-mono); font-size: var(--t-micro); letter-spacing: 0.06em;
+    color: var(--fg-2); background: none; border: 1px solid var(--rule-2); border-radius: var(--r);
+    padding: 0.28rem 0.6rem; cursor: pointer;
+    transition: border-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
+  }
+  .rt-key:hover { color: var(--fg); border-color: var(--verm); }
+
+  /* Tablet: the 8-up rail gets too tight — drop to two rows. */
+  @media (max-width: 860px) {
+    .rt-rail { grid-template-columns: repeat(4, 1fr); }
+    .rt-seg:nth-child(4) { border-right: 0; }
+    .rt-seg:nth-child(-n+4) { border-bottom: 1px solid var(--rule); }
+  }
+  /* Phone: titles vanish, the rail becomes a numbered progress strip. */
+  @media (max-width: 560px) {
+    .rt-rail { grid-template-columns: repeat(8, 1fr); }
+    .rt-seg { padding: 0.5rem 0.2rem; text-align: center; }
+    /* must match the 860px selector's specificity to undo the two-row split */
+    .rt-seg:nth-child(-n+4) { border-bottom: 0; }
+    .rt-seg:nth-child(4) { border-right: 1px solid var(--rule); }
+    .rt-seg-t { display: none; }
+    .rt-log { height: 20rem; font-size: 0.75rem; padding: 0.85rem; }
+    .rt-input { padding: 0.6rem 0.85rem; }
+    .rt-prompt { font-size: 0.7rem; }
+  }
+</style>

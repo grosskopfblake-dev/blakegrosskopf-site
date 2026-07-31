@@ -3,6 +3,8 @@ import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import KillChain from '../../components/KillChain.astro';
 import ImageSlot from '../../components/ImageSlot.astro';
+import ReplayTerminal from '../../components/ReplayTerminal.astro';
+import { replayFor } from '../../lib/drift-replay';
 
 export async function getStaticPaths() {
   const work = (await getCollection('work', ({ data }) => !data.draft)).sort(
@@ -19,6 +21,8 @@ const { data } = entry;
 const { Content } = await render(entry);
 const fmtDate = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 const statusLabel = data.status === 'in-progress' ? 'In progress' : data.status === 'ongoing' ? 'Ongoing' : 'Complete';
+// Engagements with replay data get an interactive walk-through of their chain.
+const replay = replayFor(entry.id);
 const kindLabel: Record<string, string> = { repo: 'Repository', writeup: 'Write-up', external: 'Reference', demo: 'Demo' };
 ---
 <Base title={data.title} description={data.summary} image={data.heroImage ?? '/og.svg'} article>
@@ -122,6 +126,13 @@ const kindLabel: Record<string, string> = { repo: 'Repository', writeup: 'Write-
           ))}
         </ul>
       </section>
+    )}
+
+    <!-- interactive replay — stands in for screenshots on engagements that have none -->
+    {replay && data.killchain.length > 0 && (
+      <div class="container">
+        <ReplayTerminal steps={data.killchain} replay={replay} id={`replay-${entry.id}`} />
+      </div>
     )}
 
     <!-- takeaway -->
