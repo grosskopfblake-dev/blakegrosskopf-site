@@ -128,7 +128,7 @@ const kindLabel: Record<string, string> = { repo: 'Repository', writeup: 'Write-
       </section>
     )}
 
-    <!-- interactive replay — stands in for screenshots on engagements that have none -->
+    <!-- interactive replay of the chain, for engagements that supply replay data -->
     {replay && data.killchain.length > 0 && (
       <div class="container">
         <ReplayTerminal steps={data.killchain} replay={replay} id={`replay-${entry.id}`} />

@@ -2,11 +2,10 @@
 /*
   ReplayTerminal — an interactive walk-through of a case study's kill chain.
 
-  This is the evidence section for engagements that have no screenshots: the
-  reader re-runs the attack instead of squinting at a capture. Stage titles and
-  ATT&CK IDs come from the entry's `killchain` frontmatter, so the replay and
-  the written case study can never disagree; the shell mechanics come from
-  src/lib/drift-replay.ts.
+  The evidence section: the reader re-runs the attack rather than reading about
+  it. Stage titles and ATT&CK IDs come from the entry's `killchain` frontmatter,
+  so the replay and the written case study can never disagree; the shell
+  mechanics come from src/lib/drift-replay.ts.
 
   Static, no dependencies, no network. Degrades to a readable transcript with
   JS off, and to a tap-through with no keyboard.
@@ -40,9 +39,9 @@ const payload = JSON.stringify({
   <div class="rt-head">
     <h2 id={`${id}-h`} class="block-h"><span class="marker">C</span>Walk the chain</h2>
     <p class="rt-lead serif">
-      No screenshots for this one — a replay instead. Eight stages, the same
-      order they happened in, including the dead end I hit at stage 05. Type the
-      move or press <kbd>Tab</kbd> to autofill it.
+      Run the engagement yourself. Eight stages in the order they happened,
+      including the dead end at stage 05. Type the move, or press
+      <kbd>Tab</kbd> to autofill it.
     </p>
   </div>
 
