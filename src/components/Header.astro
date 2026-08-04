@@ -5,8 +5,10 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
 ---
 <header class="site-head">
   <div class="container head-in">
-    <a href="/" class="wordmark" aria-label={`${site.name} — home`}>
-      <img class="wm-logo" src="/logo.png" width="38" height="38" alt={`${site.name} — home`} decoding="async" />
+    {/* The link carries the accessible name; the mark itself is decorative, so
+        an alt here would make screen readers announce it twice. */}
+    <a href="/" class="wordmark" aria-label={`${site.name}, home`}>
+      <img class="wm-logo" src="/logo.png" width="38" height="38" alt="" decoding="async" />
     </a>
 
     <nav class="nav" aria-label="Primary">
@@ -113,6 +115,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
 
   @media (max-width: 620px) {
     .menu-btn { display: inline-grid; }
+    .icon-btn { width: 44px; height: 44px; }   /* full touch target on phones */
     .nav-list {
       position: absolute; top: 60px; left: 0; right: 0;
       flex-direction: column; align-items: stretch; gap: 0;

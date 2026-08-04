@@ -22,7 +22,10 @@ const year = new Date().getFullYear();
 </footer>
 
 <style>
-  .site-foot { border-top: 1px solid var(--rule); margin-top: var(--sp-8); padding-block: var(--sp-7) var(--sp-5); }
+  /* The preceding section already carries a large bottom padding, so the
+     footer only needs a small margin of its own — sp-8 here stacked into a
+     visible dead zone above the rule. */
+  .site-foot { border-top: 1px solid var(--rule); margin-top: var(--sp-5); padding-block: var(--sp-7) var(--sp-5); }
   .foot-in { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2rem 3rem; align-items: end; }
   .foot-mail {
     display: inline-block; margin-top: 0.9rem;

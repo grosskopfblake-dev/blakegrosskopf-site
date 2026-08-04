@@ -14,14 +14,21 @@ const stateLabel: Record<string, string> = { held: 'Completed', active: 'Active'
 </ul>
 
 <style>
-  .certs { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.75rem 0.5rem; }
+  /* A grid, not a wrapping flex row: every card is the same width and the row
+     count is explicit, so a connector arrow is only ever drawn where the next
+     step actually sits beside it. */
+  .certs { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.75rem 0.5rem; grid-template-columns: 1fr; }
+  @media (min-width: 480px) { .certs { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 880px) { .certs { grid-template-columns: repeat(4, 1fr); } }
   .cert {
     position: relative; display: flex; flex-direction: column; gap: 0.25rem;
+    min-width: 0;
     border: 1px solid var(--rule); border-radius: var(--r); padding: 0.7rem 0.9rem;
-    min-width: 8.5rem; flex: 1 1 auto;
   }
   .cert-id { font-family: var(--font-mono); font-weight: 500; font-size: 0.95rem; letter-spacing: 0.02em; }
-  .cert-name { font-size: var(--t-small); color: var(--fg-2); line-height: 1.3; }
+  /* The name absorbs the slack so every card's status row sits on one shared
+     baseline, however many lines the cert title runs to. */
+  .cert-name { font-size: var(--t-small); color: var(--fg-2); line-height: 1.3; flex: 1; }
   .cert-state {
     font-family: var(--font-mono); font-size: var(--t-micro); letter-spacing: 0.12em;
     text-transform: uppercase; color: var(--fg-3);
@@ -35,8 +42,10 @@ const stateLabel: Record<string, string> = { held: 'Completed', active: 'Active'
   .cert.is-active .cert-state { color: var(--verm-hot); }
   .cert.is-active .cert-state::before { background: var(--verm); box-shadow: 0 0 0 3px var(--glow); }
   .cert.is-target .cert-state::before { background: transparent; border: 1px solid var(--fg-3); }
-  .cert-sep { position: absolute; right: -0.5rem; top: 50%; transform: translateY(-50%); color: var(--fg-3); font-size: 0.8rem; z-index: 1; }
-  @media (max-width: 560px) { .cert-sep { display: none; } }
+  /* Connectors only exist in the single-row layout; below that the cards read
+     top-to-bottom on their own and an arrow would point at nothing. */
+  .cert-sep { display: none; position: absolute; right: -0.5rem; top: 50%; transform: translateY(-50%); color: var(--fg-3); font-size: 0.8rem; z-index: 1; }
+  @media (min-width: 880px) { .cert-sep { display: block; } }
 
   /* ---- Progress: the path traversed so far reads in colour — a completed
      step's connector is lit, the active step is the hot frontier, targets stay

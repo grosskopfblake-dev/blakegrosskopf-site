@@ -1,6 +1,6 @@
 ---
 title: "The metadata endpoint depends on the compute type"
-description: "An SSRF into an Azure Function returned an empty metadata response — not because the attack failed, but because Functions has no VM IMDS. A short lesson on matching the metadata endpoint to the compute you actually landed on."
+description: "An SSRF into an Azure Function returned an empty metadata response, not because the attack failed, but because Functions has no VM IMDS. A short lesson on matching the metadata endpoint to the compute you actually landed on."
 date: 2026-07-11
 tags: ["azure", "ssrf", "imds", "managed-identity", "cloud"]
 related: ["operation-vermillion-drift"]
@@ -10,7 +10,7 @@ heroAlt: "Comparison of VM IMDS versus App Service identity endpoints."
 There's a reflex every cloud tester has: find an SSRF, point it at
 `169.254.169.254`, collect the managed-identity token, win. During
 [Operation Vermillion Drift](/work/operation-vermillion-drift/) that reflex returned
-**nothing** — and the empty response was more instructive than a token would have been.
+**nothing**, and the empty response was more instructive than a token would have been.
 
 ## Why the metadata call came back empty
 
@@ -28,7 +28,7 @@ The metadata surface you target has to match the compute you actually landed on:
   runtime injects `IDENTITY_ENDPOINT` and `IDENTITY_HEADER` **environment variables**,
   and you request the token from that local endpoint with that header.
 
-So the fix for a "failed" SSRF is often not a different vulnerability — it's a different
+So the fix for a "failed" SSRF is often not a different vulnerability. It's a different
 target for the same one.
 
 ## The pivot that still worked
@@ -36,7 +36,7 @@ target for the same one.
 Since the environment held the secrets anyway, I re-aimed the same SSRF at
 **`file:///proc/self/environ`** and dumped the function's entire environment: the live
 signing key, connection strings, and a bonus storage SAS. When credentials live in the
-process environment, a `file://` read rivals an IMDS token — and it doesn't care what
+process environment, a `file://` read rivals an IMDS token, and it doesn't care what
 compute type you're on.
 
 ## The takeaway

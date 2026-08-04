@@ -13,7 +13,7 @@ const work = (await getCollection('work', ({ data }) => !data.draft)).sort(
       <header class="page-head" data-reveal>
         <p class="eyebrow eyebrow--rule">Case studies</p>
         <h1>Work</h1>
-        <p class="page-lead serif">Each of these is a self-directed project on infrastructure I own or am authorized to test — built, broken, and documented end to end. Report structure throughout: scope, recon, finding, impact, remediation, mapped to MITRE ATT&amp;CK.</p>
+        <p class="page-lead serif">Each of these is a self-directed project on infrastructure I own or am authorized to test, built, broken, and documented end to end. Report structure throughout: scope, recon, finding, impact, remediation, all mapped to MITRE ATT&amp;CK.</p>
       </header>
       <div class="work-list">
         {work.map((w, i) => (

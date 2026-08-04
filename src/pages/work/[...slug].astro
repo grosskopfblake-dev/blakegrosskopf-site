@@ -25,7 +25,7 @@ const statusLabel = data.status === 'in-progress' ? 'In progress' : data.status 
 const replay = replayFor(entry.id);
 const kindLabel: Record<string, string> = { repo: 'Repository', writeup: 'Write-up', external: 'Reference', demo: 'Demo' };
 ---
-<Base title={data.title} description={data.summary} image={data.heroImage ?? '/og.svg'} article>
+<Base title={data.title} description={data.summary} image={data.heroImage ?? '/og.png'} article>
   <article class="cs">
     <!-- header -->
     <header class="section cs-head-sec">
@@ -145,21 +145,24 @@ const kindLabel: Record<string, string> = { repo: 'Repository', writeup: 'Write-
       </section>
     )}
 
-    <!-- prev / next -->
-    <nav class="container cs-nav" aria-label="More work">
-      {prev ? (
-        <a href={`/work/${prev.id}/`} class="cs-nav-item cs-nav-prev">
-          <span class="cs-nav-dir">← Previous</span>
-          <span class="cs-nav-title">{prev.data.title}</span>
-        </a>
-      ) : <span></span>}
-      {next && (
-        <a href={`/work/${next.id}/`} class="cs-nav-item cs-nav-next">
-          <span class="cs-nav-dir">Next →</span>
-          <span class="cs-nav-title">{next.data.title}</span>
-        </a>
-      )}
-    </nav>
+    <!-- prev / next — omitted entirely when this is the only case study, so the
+         page never ends on an empty ruled block -->
+    {(prev || next) && (
+      <nav class="container cs-nav" aria-label="More work">
+        {prev ? (
+          <a href={`/work/${prev.id}/`} class="cs-nav-item cs-nav-prev">
+            <span class="cs-nav-dir">← Previous</span>
+            <span class="cs-nav-title">{prev.data.title}</span>
+          </a>
+        ) : <span></span>}
+        {next && (
+          <a href={`/work/${next.id}/`} class="cs-nav-item cs-nav-next">
+            <span class="cs-nav-dir">Next →</span>
+            <span class="cs-nav-title">{next.data.title}</span>
+          </a>
+        )}
+      </nav>
+    )}
   </article>
 </Base>
 
@@ -205,6 +208,29 @@ const kindLabel: Record<string, string> = { repo: 'Repository', writeup: 'Write-
   .findings .f-mitre { color: var(--fg-2); white-space: nowrap; }
   .findings .f-rec { color: var(--fg-2); min-width: 16rem; font-size: 0.98rem; }
   .findings-wrap { border-radius: var(--r); }
+
+  /* Mobile: the findings table becomes stacked cards, the same pattern the
+     skills table uses on About. A four-column report table behind a sideways
+     scroll is unreadable on a phone, and the recommendation is the column
+     people actually need. */
+  @media (max-width: 720px) {
+    .findings-wrap { overflow-x: visible; }
+    .findings, .findings tbody, .findings tr, .findings td { display: block; width: 100%; }
+    .findings thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+    .findings tr {
+      border: 1px solid var(--rule); border-radius: var(--r-lg);
+      padding: 1rem 1.1rem; margin-bottom: 0.75rem;
+    }
+    .findings td { border: 0; padding: 0; min-width: 0; }
+    .findings .f-title { font-size: 1.05rem; margin: 0.55rem 0 0.35rem; }
+    .findings .f-mitre { font-size: var(--t-micro); letter-spacing: 0.08em; white-space: normal; }
+    .findings .f-rec { margin-top: 0.7rem; padding-top: 0.7rem; border-top: 1px solid var(--rule); font-size: 1rem; }
+    .findings .f-rec::before {
+      content: "Fix"; display: block; margin-bottom: 0.3rem;
+      font-family: var(--font-mono); font-size: var(--t-micro);
+      letter-spacing: 0.14em; text-transform: uppercase; color: var(--fg-3);
+    }
+  }
 
   .mitre-grid { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; grid-template-columns: 1fr; }
   @media (min-width: 620px) { .mitre-grid { grid-template-columns: 1fr 1fr; } }

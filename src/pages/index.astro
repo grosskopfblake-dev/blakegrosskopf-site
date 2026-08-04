@@ -17,9 +17,9 @@ const posts = (await getCollection('writing', ({ data }) => !data.draft))
   .slice(0, 2);
 
 const approach = [
-  { k: 'Build', v: 'I stand up the range myself — Terraform, real cloud, real constraints — so the attack path is genuine, not a screenshot.' },
+  { k: 'Build', v: 'I stand up the range myself in Terraform, on real cloud with real constraints, so the attack path is genuine rather than a screenshot.' },
   { k: 'Break', v: 'External-attacker lens, end to end: public exposure → tokens → secrets → subscription-level control. Evidence, not adjectives.' },
-  { k: 'Document', v: 'Every finding maps to MITRE ATT&CK and ships with the defense — the control, the detection, the one change that breaks the chain.' },
+  { k: 'Document', v: 'Every finding maps to MITRE ATT&CK and ships with its defense: the control, the detection, and the one change that breaks the chain.' },
 ];
 const fmtDate = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 ---
@@ -29,7 +29,7 @@ const fmtDate = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', mo
     <div class="container hero-in">
       <p class="eyebrow eyebrow--rule" data-reveal>{site.name} · {site.role}</p>
       <h1 class="hero-h" data-reveal style="--reveal-delay:60ms">
-        I build cloud and enterprise labs, then break them<span class="hero-em"> — and write the defense that stops me.</span>
+        I build cloud and enterprise labs, then break them<span class="hero-em">, and write the defense that stops me.</span>
       </h1>
       <p class="hero-lead serif" data-reveal style="--reveal-delay:120ms">{site.pitch}</p>
       <div class="hero-cta" data-reveal style="--reveal-delay:180ms">
@@ -123,7 +123,7 @@ const fmtDate = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', mo
   <section class="section contact-cta" aria-labelledby="cta-h">
     <div class="container cta-in" data-reveal>
       <h2 id="cta-h">Looking for an offensive, cloud, or web-app security researcher?</h2>
-      <p class="serif cta-lead">I'm open to roles and collaboration. The fastest way to gauge fit is to read a case study — then say hello.</p>
+      <p class="serif cta-lead">I'm open to roles and collaboration. The fastest way to gauge fit is to read a case study, then say hello.</p>
       <div class="hero-cta">
         <a href="/contact/" class="btn btn--primary">Get in touch <svg class="arw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
         <a href={site.socials.github} class="btn" target="_blank" rel="noopener">GitHub</a>
@@ -167,6 +167,13 @@ const fmtDate = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', mo
   .sec-more:hover { color: var(--fg); }
   .sec-more .arw { width: 14px; height: 14px; color: var(--verm-hot); transition: transform var(--dur-1) var(--ease); }
   .sec-more:hover .arw { transform: translateX(3px); }
+  /* On a phone the heading and its "all …" link no longer compete for one row:
+     side by side, the heading was being squeezed into a break between its
+     marker and its title. */
+  @media (max-width: 600px) {
+    .sec-head { flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
+    .sec-head h2 { flex: 1 0 100%; }
+  }
 
   .work-grid { display: grid; gap: 1.25rem; }
 
@@ -189,16 +196,21 @@ const fmtDate = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', mo
   .post-date { font-size: var(--t-small); color: var(--fg-3); }
   .post-body { display: flex; flex-direction: column; gap: 0.3rem; min-width: 0; }
   .post-title { font-family: var(--font-display); font-weight: 500; font-size: 1.2rem; letter-spacing: -0.01em; transition: color var(--dur-1) var(--ease); }
-  .post-desc { color: var(--fg-2); font-size: 1rem; line-height: 1.45; }
+  .post-desc { color: var(--fg-2); font-size: 1rem; line-height: 1.45; max-width: 68ch; }
   .post-arw { width: 16px; height: 16px; color: var(--verm-hot); transition: transform var(--dur-1) var(--ease); }
   @media (max-width: 600px) {
-    .post-row { grid-template-columns: 1fr auto; }
+    /* Date moves to its own line and the chevron aligns to the title rather
+       than floating in the middle of the wrapped description. */
+    .post-row { grid-template-columns: 1fr auto; align-items: start; gap: 0.35rem 1rem; }
     .post-date { grid-column: 1 / -1; }
+    .post-arw { margin-top: 0.4rem; }
   }
 
   .contact-cta { border-top: 1px solid var(--rule); }
-  .cta-in { max-width: 40ch; }
-  .cta-in h2 { font-size: var(--t-h2); }
+  /* The measure is set on the text, not on the container. Capping .container
+     itself would re-centre the whole block and break the left edge that every
+     other section on the page shares. */
+  .cta-in h2 { font-size: var(--t-h2); max-width: 22ch; }
   .cta-lead { margin-top: 1rem; color: var(--fg-2); font-size: 1.15rem; line-height: 1.5; max-width: 46ch; }
 
   /* ---- Signature: the hero KillChain assembles left→right on reveal. Driven

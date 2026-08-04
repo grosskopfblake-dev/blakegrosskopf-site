@@ -1,0 +1,8 @@
+# Cloudflare Pages response headers.
+# Keep the hosted resume PDF out of search indexes. This complements — it does
+# not replace — the fact that the site copy of the resume has the phone number
+# removed (the full version with phone lives in personal/, for direct job
+# applications). noindex only binds well-behaved crawlers (Google, Bing); it is
+# a second layer, not a security boundary.
+/blake-grosskopf-resume.pdf
+  X-Robots-Tag: noindex

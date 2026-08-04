@@ -6,14 +6,14 @@ import { site } from '../lib/site';
 const WORK = '/work/operation-vermillion-drift/';
 const skills = [
   { skill: 'Azure attack paths', detail: 'Public exposure → IMDS / managed-identity abuse → storage, secrets, and subscription-level control', href: WORK, evLabel: 'Vermillion Drift' },
-  { skill: 'Cloud range building (Terraform)', detail: 'Standing up real, misconfigured cloud environments as IaC — and troubleshooting live deployments', href: WORK, evLabel: 'Vermillion Drift' },
-  { skill: 'Active Directory enumeration & priv-esc', detail: 'PowerShell and BloodHound Enterprise — mapping privilege-escalation paths across a Windows domain', href: site.resume, evLabel: 'Resume' },
+  { skill: 'Cloud range building (Terraform)', detail: 'Standing up real, misconfigured cloud environments as IaC, then troubleshooting live deployments', href: WORK, evLabel: 'Vermillion Drift' },
+  { skill: 'Active Directory enumeration & priv-esc', detail: 'Mapping privilege-escalation paths across a Windows domain with PowerShell, Windows RSAT, and the Active Directory module', href: site.resume, evLabel: 'Resume' },
   { skill: 'Threat-based risk assessment', detail: 'MITRE ATT&CK / NIST-aligned methodology; phishing triage at enterprise scale', href: site.resume, evLabel: 'Resume' },
   { skill: 'ATT&CK mapping & detection', detail: 'Every finding mapped to a technique and paired with the control or detection that breaks it', href: WORK, evLabel: 'Vermillion Drift' },
-  { skill: 'Offensive tooling (Python)', detail: 'stdlib-first — from captured traffic to a working primitive', href: WORK, evLabel: 'Vermillion Drift' },
+  { skill: 'Offensive tooling (Python)', detail: 'stdlib-first: captured traffic in, working primitive out', href: WORK, evLabel: 'Vermillion Drift' },
 ];
 ---
-<Base title="About" description="Blake Grosskopf — aspiring red teamer focused on cloud and enterprise attack paths.">
+<Base title="About" description="Blake Grosskopf, an aspiring red teamer focused on cloud and enterprise attack paths.">
   <section class="section">
     <div class="container">
       <header class="page-head" data-reveal>
@@ -24,10 +24,10 @@ const skills = [
 
       <div class="about-grid">
         <div class="about-bio prose" data-reveal>
-          <p>I'm an aspiring red teamer working <strong>cloud and enterprise attack paths</strong>. The throughline in everything I do: I don't just point tools at someone else's target — I <strong>build the environment myself</strong>, break in from the outside, then write the defense that would've stopped me.</p>
-          <p>That comes from a <strong>software-engineering background</strong> — the instinct underneath all of it is building. I like taking something apart to see how it works, then turning that into a solution: a script, a small tool, a primitive, in Python or whatever fits.</p>
-          <p>On the cloud side I chain real Azure attack paths from public exposure to subscription-level control, standing the range up in Terraform and fighting the constraints of doing it on a locked-down subscription. Right now I'm focused on <strong>cloud and AI security</strong> and pen testing.</p>
-          <p>Everything here is self-directed research on infrastructure I own or am cleared to test, kept dual-use: methodology, ATT&amp;CK mapping, and hardening. The runnable tooling stays private — the understanding and the defenses are what I publish.</p>
+          <p>I'm an aspiring red teamer working <strong>cloud and enterprise attack paths</strong>. The throughline in everything I do is that I don't just point tools at someone else's target. I <strong>build the environment myself</strong>, break in from the outside, then write the defense that would have stopped me.</p>
+          <p>That comes from a <strong>software-engineering background</strong>, so the instinct underneath all of it is building. I like taking something apart to see how it works, then turning what I learn into something usable: a script, a small tool, a primitive, in Python or whatever fits.</p>
+          <p>On the cloud side I chain real Azure attack paths from public exposure to subscription-level control, standing the range up in Terraform and working around the constraints of a locked-down subscription. Right now my focus is <strong>cloud and AI security</strong>, and pen testing.</p>
+          <p>Everything here is self-directed research on infrastructure I own or am cleared to test, and it stays dual-use: methodology, ATT&amp;CK mapping, and hardening. The runnable tooling stays private. What I publish is the understanding and the defenses.</p>
         </div>
 
         <aside class="about-side" data-reveal style="--reveal-delay:80ms">
@@ -88,15 +88,17 @@ const skills = [
   .about-bio.prose { max-width: 64ch; }
   .side-card { border: 1px solid var(--rule); border-radius: var(--r-lg); padding: 1.25rem; background: var(--surface); }
   .focus-list { list-style: none; margin: 0.8rem 0 0; padding: 0; display: grid; gap: 0.55rem; font-size: var(--t-small); }
-  .focus-list li { display: flex; align-items: center; gap: 0.55rem; }
-  .focus-list li::before { content: ""; width: 6px; height: 6px; border-radius: 1px; background: var(--verm); transform: rotate(45deg); flex: none; }
+  /* Markers align to the first line of text, so a two-line item doesn't float
+     its diamond into the middle of the entry. */
+  .focus-list li { display: flex; align-items: flex-start; gap: 0.55rem; }
+  .focus-list li::before { content: ""; width: 6px; height: 6px; margin-top: 0.5em; border-radius: 1px; background: var(--verm); transform: rotate(45deg); flex: none; }
   .about-block { margin-top: clamp(2.75rem, 6vw, 4rem); }
   .block-h { font-size: var(--t-h3); margin-bottom: 1.4rem; }
   .block-h .marker { font-size: 0.5em; vertical-align: 0.5em; }
   .skills { width: 100%; border-collapse: collapse; font-family: var(--font-display); }
   .skills th { font-family: var(--font-mono); font-size: var(--t-micro); letter-spacing: 0.1em; text-transform: uppercase; color: var(--fg-3); text-align: left; padding: 0 0.9rem 0.7rem; border-bottom: 1px solid var(--rule); white-space: nowrap; }
   .skills td { padding: 0.95rem 0.9rem; border-bottom: 1px solid var(--rule); vertical-align: top; font-size: var(--t-small); }
-  .sk-name { font-weight: 500; min-width: 13rem; }
+  .sk-name { font-weight: 500; min-width: 16rem; }
   .sk-detail { color: var(--fg-2); min-width: 15rem; font-size: 1rem; }
   .sk-ev { font-family: var(--font-mono); font-size: var(--t-small); color: var(--verm-hot); white-space: nowrap; }
   .sk-ev:hover { text-decoration: underline; text-underline-offset: 3px; }

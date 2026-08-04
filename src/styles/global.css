@@ -34,6 +34,9 @@ body {
 main { flex: 1 0 auto; }
 
 h1, h2, h3, h4 { font-weight: 500; line-height: 1.08; letter-spacing: -0.02em; text-wrap: balance; }
+/* Body copy sets its own last line rather than leaving a single-word orphan.
+   Ignored by browsers without support, so it is safe to apply broadly. */
+p, li, dd, figcaption { text-wrap: pretty; }
 h1 { font-size: var(--t-h1); }
 h2 { font-size: var(--t-h2); }
 h3 { font-size: var(--t-h3); }
@@ -58,7 +61,9 @@ h4 { font-size: var(--t-h4); letter-spacing: -0.01em; }
 .eyebrow--rule::after { content: ""; height: 1px; flex: 1; background: var(--rule); }
 .eyebrow .idx { color: var(--fg-3); }
 
-.mono { font-family: var(--font-mono); }
+/* Mono carries dates, IDs and counters, so lock its digits to one width —
+   columns of numbers line up and never jitter between values. */
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 .serif { font-family: var(--font-serif); }
 .label {
   font-family: var(--font-mono); font-size: var(--t-micro);
@@ -71,10 +76,11 @@ h4 { font-size: var(--t-h4); letter-spacing: -0.01em; }
 
 /* buttons */
 .btn {
-  display: inline-flex; align-items: center; gap: 0.55rem;
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.55rem;
   font-family: var(--font-mono); font-size: var(--t-small);
   letter-spacing: 0.04em; padding: 0.7rem 1.15rem; border-radius: var(--r);
   border: 1px solid var(--rule-2); color: var(--fg);
+  min-height: 44px;   /* comfortable touch target on every button sitewide */
   transition: border-color var(--dur-1) var(--ease), background var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
 }
 .btn .arw { transition: transform var(--dur-1) var(--ease); }
@@ -132,9 +138,16 @@ h4 { font-size: var(--t-h4); letter-spacing: -0.01em; }
 .prose table { width: 100%; border-collapse: collapse; font-family: var(--font-display); font-size: var(--t-small); }
 .prose :is(th,td) { text-align: left; padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
 .prose th { font-family: var(--font-mono); font-size: var(--t-micro); letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-3); }
+/* Screenshots dropped into a write-up inherit the same frame as every other
+   surface, so a real image never looks pasted on top of the design. */
+.prose img { border: 1px solid var(--rule); border-radius: var(--r-lg); }
+.prose figure { margin-top: 1.6em; }
+.prose figcaption { font-family: var(--font-mono); font-size: var(--t-micro); letter-spacing: 0.08em; color: var(--fg-3); margin-top: 0.7rem; }
+.prose hr { height: 1px; background: var(--rule); border: 0; margin-block: 2.2em; }
 
 /* wide-content scroll guard */
-.scroll-x { overflow-x: auto; }
+.scroll-x { overflow-x: auto; overscroll-behavior-x: contain; }
+.scroll-x, .kc-rail { scrollbar-width: thin; scrollbar-color: var(--rule-2) transparent; }
 
 /* scroll reveal — opt-in via data-reveal; disabled under reduced-motion */
 [data-reveal] {
